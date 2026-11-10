@@ -269,6 +269,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (
+      currentWidth > MAX_OUTPUT_DIMENSION ||
+      currentHeight > MAX_OUTPUT_DIMENSION ||
+      currentWidth * currentHeight > MAX_OUTPUT_PIXELS
+    ) {
+      return badRequest("Processed image dimensions exceed the output limit.", 413);
+    }
+
     if (colorShift !== 0) {
       const brightnessFactor = 1 + colorShift / 100;
       pipeline = pipeline.modulate({ brightness: brightnessFactor });
