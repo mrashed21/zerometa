@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { detectImageMime, safeOutputFilename } from "../src/app/api/process-image/route.ts";
+import { detectImageMime, safeOutputFilename } from "../src/lib/image-validation.ts";
 import { buildMetadataRemovalArgs } from "../src/lib/ffmpeg-processor.ts";
 
 test("image signature detection rejects MIME spoofing", () => {
