@@ -43,3 +43,4 @@ jobs:
 
       - name: Build Next.js application
         run: pnpm run build
+

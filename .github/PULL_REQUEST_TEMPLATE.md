@@ -39,3 +39,4 @@ Please confirm that all verification steps were executed before submitting:
 - [ ] Verified responsive layout across desktop and mobile screen sizes.
 - [ ] Maintained ZeroMeta's client-first privacy architecture (no secret keys, no unintended server telemetry or external logging).
 - [ ] Updated corresponding documentation, tool tips, or guides if applicable.
+

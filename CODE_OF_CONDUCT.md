@@ -38,3 +38,4 @@ If you experience or witness unacceptable behavior, please report it privately t
 - **Email**: `mrashed21@gmail.com`
 
 All reports will be reviewed promptly, treated confidentially, and resolved fairly.
+

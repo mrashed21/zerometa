@@ -49,3 +49,4 @@ ZeroMeta is engineered to minimize attack surface and data exposure:
 2. **Stateless Fallback Processing**: If a fallback serverless route is utilized for complex formats, operations are strictly executed in ephemeral memory without persistent storage, database logging, or third-party analytical telemetry.
 3. **No Credential Requirements**: ZeroMeta does not require accounts, cookies, or external authentication tokens to function.
 4. **Third-Party Dependencies**: Dependencies are regularly audited for known CVEs via automated dependency scanning.
+
