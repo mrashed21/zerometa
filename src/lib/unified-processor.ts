@@ -14,7 +14,8 @@ import type {
   ProcessingOptions,
   ProcessingResult,
 } from "./types";
-import { getMediaType } from "./media-types";\nimport { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "./constants";
+import { getMediaType } from "./media-types";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "./constants";
 
 /**
  * Extracts metadata for any supported file format.
