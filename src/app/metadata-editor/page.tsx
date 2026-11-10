@@ -111,7 +111,13 @@ export default function MetadataEditorPage() {
 
     setIsSaving(true);
     try {
-      if (activeFile.mediaType === "image") {
+      if (activeFile.mediaType !== "image") {
+        throw new Error("Metadata editing is currently supported for images only.");
+      }
+      if (activeFile.file.size > MAX_SERVER_IMAGE_UPLOAD_BYTES) {
+        throw new Error("Metadata editing supports images up to 4 MB on this deployment.");
+      }
+      {
         // Send to server-side sharp with clean-branding and custom fields
         const formData = new FormData();
         formData.append("file", activeFile.file);
@@ -128,7 +134,7 @@ export default function MetadataEditorPage() {
           body: formData,
         });
 
-        if (!resp.ok) throw new Error("Failed to process image metadata");
+        if (!resp.ok) {\n          const error = await resp.json().catch(() => ({}));\n          throw new Error(error.error || "Failed to process image metadata.");\n        }
 
         const blob = await resp.blob();
         const ext = activeFile.file.name.split(".").pop() || "jpg";
@@ -180,33 +186,19 @@ export default function MetadataEditorPage() {
       ]}
       supportedFormats={[
         {
-          format: "JPEG / JPG",
-          extension: ".jpg, .jpeg",
-          capabilities: "IFD0 Artist, Copyright, ImageDescription, Software",
-          notes: "Safely writes standard EXIF IFD0 tags.",
-        },
-        {
-          format: "PNG / WebP",
-          extension: ".png, .webp",
-          capabilities: "Standardized text chunks, XMP attribution",
-          notes:
-            "Neutralizes GPS and device serials while attaching creator credit.",
-        },
-        {
-          format: "PDF Documents",
-          extension: ".pdf",
-          capabilities: "/Title, /Author, /Subject, /Keywords",
-          notes:
-            "Updates document summary properties without modifying content.",
+          format: "JPEG / PNG / WebP / GIF / TIFF",
+          extension: ".jpg, .jpeg, .png, .webp, .gif, .tif, .tiff",
+          capabilities: "EXIF Artist, Copyright, ImageDescription, Software, Title, and Keywords",
+          notes: "Source metadata is stripped; selected EXIF fields are written to the output.",
         },
       ]}
       privacyNotes={[
-        "Only the tags you explicitly specify in the form are attached to the output file.",
-        "Invasive tags like GPS coordinates, camera serial numbers, and OS versions are permanently stripped.",
+        "Source EXIF, XMP, and IPTC metadata are not preserved; selected EXIF fields and the ZeroMeta software tag are written.",
+        "GPS coordinates and camera serial numbers from the source are not copied to the output image.",
       ]}
       limitations={[
-        "Metadata editing currently supports raster images only; PDF and audio metadata editing is not available in this tool.",\n        "Some output formats do not support every EXIF tag, so tag availability varies by format.",
-        "Certain media players may cache previous tags locally unless reloaded.",
+        "Metadata editing currently supports raster images only; PDF and audio metadata editing is not available in this tool.",
+        "Some output formats do not support every EXIF tag, so tag availability varies by format.",
       ]}
       faqs={[
         {
