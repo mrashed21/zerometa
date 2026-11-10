@@ -1,11 +1,11 @@
 {
-  "name": "ZeroMeta",
+  "name": "ZeroMeta — Digital Media Privacy Toolkit",
   "short_name": "ZeroMeta",
-  "description": "AI Image Metadata & Invisible Watermark Remover Studio",
+  "description": "Your Files. Your Privacy. Zero Metadata. Client-side media privacy toolkit.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#09090b",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "any",
   "icons": [
     {
@@ -21,7 +21,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "photo"],
+  "categories": ["utilities", "photo", "security"],
   "lang": "en",
   "dir": "ltr"
 }

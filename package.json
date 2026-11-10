@@ -1,8 +1,15 @@
 {
-  "name": "cleanexif-ai",
+  "name": "zerometa",
   "version": "1.0.0",
   "private": true,
-  "description": "AI Image Metadata & Invisible Watermark Remover Studio",
+  "description": "ZeroMeta is an open-source, privacy-focused media metadata toolkit for inspecting and removing hidden metadata from supported files.",
+  "author": "Muhammad Rashed <mrashed21@gmail.com> (https://www.mrashed21.me/)",
+  "homepage": "https://www.zerometa.tech",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrashed21/zerometa.git"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

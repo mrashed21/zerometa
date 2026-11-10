@@ -1,9 +1,7 @@
 import type { MediaFile, MetadataField, ProcessingOptions } from "./types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let ffmpegInstance: any = null;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getFFmpeg(): Promise<any> {
   if (typeof window === "undefined") {
     throw new Error("FFmpeg processing is only available in the browser.");
@@ -14,7 +12,6 @@ async function getFFmpeg(): Promise<any> {
   }
 
   // Dynamic import via Function to avoid Turbopack static worker bundling error
-  // eslint-disable-next-line @typescript-eslint/no-implied-eval
   const ffmpegModule = await (new Function('return import("@ffmpeg/ffmpeg")')() as Promise<any>);
   const FFmpegClass = ffmpegModule.FFmpeg;
   const ffmpeg = new FFmpegClass();

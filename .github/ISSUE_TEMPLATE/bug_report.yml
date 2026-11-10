@@ -1,0 +1,79 @@
+name: Bug Report
+description: Report a defect, error, or unexpected behavior in ZeroMeta
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please check if a similar issue already exists before opening a new one.
+        *Note: If you are reporting a security vulnerability, please refer to our [Security Policy](https://github.com/mrashed21/zerometa/blob/main/SECURITY.md) instead of creating a public issue.*
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Provide a clear and concise description of the bug.
+      placeholder: What happened when you tried to use the tool?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: file-type
+    attributes:
+      label: Affected File Format
+      description: Which file format was involved?
+      options:
+        - JPEG / JPG
+        - PNG
+        - WebP
+        - PDF
+        - MP4 / MOV / WebM
+        - MP3 / WAV / Audio
+        - Other / General UI
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Open tool page '...'
+        2. Upload sample file of type '...'
+        3. Click on '...'
+        4. See error or unexpected result
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: The file metadata should be completely removed without visual corruption.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Information
+      description: Provide browser, device, and OS details.
+      placeholder: |
+        - Browser & Version: [e.g., Chrome 132, Firefox 135, Safari 18]
+        - OS & Version: [e.g., Windows 11, macOS Sequoia, Ubuntu 24.04, iOS 18]
+        - Processing Mode: [Client-side in-browser / Serverless fallback]
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Verification Checklist
+      options:
+        - label: I have searched existing issues and verified this has not already been reported.
+          required: true
+        - label: I am not uploading or sharing confidential or personally identifiable files.
+          required: true

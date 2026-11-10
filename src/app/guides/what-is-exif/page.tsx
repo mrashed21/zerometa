@@ -86,7 +86,7 @@ export default function WhatIsExifGuide() {
                 <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1">
                   <li><strong>Home Stalking:</strong> Posting photos taken inside your residence on classifieds, forums, or blogs reveals your exact residential address.</li>
                   <li><strong>Hardware Profiling:</strong> Unique camera body and lens serial numbers allow cross-referencing anonymous accounts to a single physical device.</li>
-                  <li><strong>Routine Mapping:</strong> A series of photos posted over time reveals children's school locations, gym routines, and vacation absences.</li>
+                  <li><strong>Routine Mapping:</strong> A series of photos posted over time reveals children&apos;s school locations, gym routines, and vacation absences.</li>
                 </ul>
               </div>
             </section>

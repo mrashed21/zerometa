@@ -1,0 +1,59 @@
+name: Feature Request
+description: Propose a new capability, file format, or user experience enhancement for ZeroMeta
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an idea! Please verify that your proposal aligns with ZeroMeta's core focus on user privacy, client-side execution, and performance.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement or Use Case
+      description: What challenge or user need does this feature address?
+      placeholder: As a photographer/privacy researcher, I often need to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed feature, how it should work, and any specific UX requirements.
+      placeholder: Introduce support for stripping metadata from AVIF files directly in the browser using...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Approaches Considered
+      description: Did you consider any alternative solutions or workarounds?
+      placeholder: A brief description of other solutions considered.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: Which area of ZeroMeta does this feature primarily impact?
+      options:
+        - Format Support (e.g. AVIF, HEIC, RAW)
+        - Privacy & Inspection Engine
+        - Redaction & Visual Tools
+        - User Interface & Accessibility
+        - Performance & Memory Optimization
+        - Documentation & Guides
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: privacy-compliance
+    attributes:
+      label: Privacy Assessment
+      options:
+        - label: This proposed feature upholds ZeroMeta's client-first, zero-retention privacy principles.
+          required: true

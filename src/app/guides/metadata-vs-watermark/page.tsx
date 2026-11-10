@@ -57,7 +57,7 @@ export default function MetadataVsWatermarkGuide() {
                 2. Visible Watermarks (Logos &amp; Overlays)
               </h2>
               <p>
-                <strong>What it is:</strong> Text, logos, or copyright notices drawn directly into the visible image pixels (e.g. "Getty Images" or a creator stamp in the corner).
+                <strong>What it is:</strong> Text, logos, or copyright notices drawn directly into the visible image pixels (e.g. &quot;Getty Images&quot; or a creator stamp in the corner).
               </p>
               <p>
                 <strong>Can metadata tools remove it?</strong> <strong>NO.</strong> Because visible watermarks are part of the image pixel content, removing file headers leaves visible watermarks completely untouched. Obscuring visible watermarks requires pixel redaction or inpainting tools.
@@ -83,7 +83,7 @@ export default function MetadataVsWatermarkGuide() {
                 ZeroMeta’s Engineering Policy
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Many scam websites falsely claim to "remove SynthID" or "erase AI watermarks" by simply running files through a canvas re-encoder. At ZeroMeta, we do not make false claims. We provide mathematically verified metadata sanitization, and we disclose precisely where metadata cleaning ends and pixel manipulation begins.
+                Many scam websites falsely claim to &quot;remove SynthID&quot; or &quot;erase AI watermarks&quot; by simply running files through a canvas re-encoder. At ZeroMeta, we do not make false claims. We provide mathematically verified metadata sanitization, and we disclose precisely where metadata cleaning ends and pixel manipulation begins.
               </p>
             </div>
           </div>

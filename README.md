@@ -1,70 +1,248 @@
+<div align="center">
+
 # ZeroMeta 🛡️
 
-A powerful, privacy-first web application designed to strip hidden metadata, EXIF data, GPS location, and AI watermarks from images, videos, and audio files. Built with Next.js 16 and Tailwind CSS.
+**Open-Source Digital Media Privacy & Metadata Toolkit**
 
-![ZeroMeta](https://img.shields.io/badge/Privacy-First-success?style=for-the-badge) ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+Inspect, scrub, and sanitize hidden EXIF, XMP, IPTC, and location metadata directly in your browser. Built with a client-first privacy architecture, Next.js, and TypeScript.
 
-## ✨ Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![CI Status](https://github.com/mrashed21/zerometa/actions/workflows/ci.yml/badge.svg)](https://github.com/mrashed21/zerometa/actions)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Zero Telemetry](https://img.shields.io/badge/Privacy-Zero_Telemetry-success)](https://www.zerometa.tech/privacy)
 
-- **Universal Format Support**: Handles `JPG`, `PNG`, `WebP`, `MP4`, `WebM`, and `MP3`.
-- **Stateless Edge Architecture**: Processing in "Privacy Clean" mode happens entirely locally in your browser. "Clean + Branding" uses stateless edge workers—zero logs, zero retention.
-- **Batch Processing**: Handle 50+ files concurrently with smart size limit validations and a unified progress UI.
-- **Result Dashboard**: Visually compare file sizes and track EXACT compression metrics with our live analytics UI.
-- **Universal ZIP Export**: Click one button to compile all your cleaned media into a single `.zip` file automatically downloaded directly to your device.
-- **Responsive & Accessible**: Seamless UI scaling from mobile to ultra-wide desktop monitors, strictly adhering to WCAG standards.
+[**Live Application**](https://www.zerometa.tech/) • [**Documentation & Guides**](https://www.zerometa.tech/guides) • [**Report an Issue**](https://github.com/mrashed21/zerometa/issues) • [**Contributing**](CONTRIBUTING.md)
+
+</div>
+
+---
+
+## 📖 Overview
+
+Every digital photo, recorded audio note, and exported document carries invisible embedded information: GPS geographic coordinates, camera make and model, camera serial numbers, lens IDs, capture timestamps, software versions, and editing histories.
+
+When files are shared online via messaging platforms, public marketplaces, or cloud storage, this invisible metadata can expose sensitive personal routines, residential locations, and physical hardware identities.
+
+**ZeroMeta** is an all-in-one privacy toolkit engineered to inspect, neutralize, and strip this sensitive metadata. Designed from the ground up to protect user privacy, ZeroMeta performs image sanitization and binary metadata stripping **directly inside your web browser**. Your sensitive files are not uploaded to remote servers or stored in remote databases.
+
+---
+
+## ✨ Key Features
+
+- **100% Client-Side Processing**: Default image sanitization and EXIF stripping execute entirely in your browser using HTML5 Canvas, WebAssembly, and local binary parsers.
+- **Deep Metadata Inspection**: View complete EXIF, XMP, IPTC, GPS coordinates, device models, and maker notes before choosing to scrub.
+- **Multi-Format Support**: Comprehensive tools for Images (`JPEG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG`), Documents (`PDF`), Video (`MP4`, `MOV`, `WebM`), and Audio (`MP3`, `WAV`, `OGG`, `M4A`).
+- **Interactive Before/After Comparison**: Side-by-side visual difference slider and metadata comparison table verifying header removal.
+- **Interactive Visual Redaction**: Blur, pixelate, or black-out sensitive areas (faces, license plates, documents) directly in the browser.
+- **Batch Processing**: Clean and process dozens of files simultaneously with real-time progress indicators.
+- **Universal ZIP Archiving**: Download all cleaned files together in an uncompressed or compressed `.zip` archive.
+- **Truth in Privacy Architecture**: Transparent disclosures that clearly distinguish between stripped header metadata and intrinsic pixel contents (such as visible logos or statistical AI watermarks like Google DeepMind SynthID).
+- **Zero Telemetry & No Tracking**: No cookies, no session trackers, no database logging, and no analytics beacons.
+
+---
+
+## 🛠️ Supported Tools & File Formats
+
+| Category | Formats | Processing Engine | Capabilities |
+| :--- | :--- | :--- | :--- |
+| **Images** | `JPEG`, `JPG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG` | HTML5 Canvas / WASM / Sharp | EXIF, GPS, XMP, IPTC stripping, visual metadata inspection, pixel redaction |
+| **Documents** | `PDF` | PDF Binary Sanitizer | Strips Document Info dictionary (`/Author`, `/Title`, `/Creator`), neutralizes embedded XMP streams |
+| **Video** | `MP4`, `MOV`, `WebM` | Client-side FFmpeg WASM / Stateless Worker | Strips container atoms, QuickTime metadata, GPS tracks, author info |
+| **Audio** | `MP3`, `WAV`, `OGG`, `M4A` | FFmpeg WASM / Binary Parser | Strips ID3v1, ID3v2, Vorbis comments, RIFF chunks, encoder signatures |
+
+---
+
+## 🏗️ Architecture Overview
+
+ZeroMeta employs a dual-tier processing pipeline designed around privacy, performance, and reliability:
+
+```
+┌────────────────────────────────────────────────────────┐
+│                   User Web Browser                     │
+│                                                        │
+│  ┌──────────────────────┐    ┌──────────────────────┐  │
+│  │ Dropzone & Uploader  │───>│ Binary File Detector │  │
+│  └──────────────────────┘    └──────────┬───────────┘  │
+│                                         │              │
+│       ┌─────────────────────────────────┴────────┐     │
+│       ▼                                          ▼     │
+│  ┌─────────────────────────┐        ┌────────────────┐ │
+│  │ HTML5 Canvas & Web Worker│        │ ExifReader.js  │ │
+│  │ (Direct Pixel Re-encode)│        │ (Tag Inspector)│ │
+│  └────────────┬────────────┘        └────────────────┘ │
+│               │                                        │
+│               ▼                                        │
+│  ┌─────────────────────────┐                           │
+│  │ Clean Blob Output       │                           │
+│  │ (GPS & EXIF Eliminated) │                           │
+│  └─────────────────────────┘                           │
+└────────────────────────────────────────────────────────┘
+```
+
+1. **Client-Side Engine (Primary)**:
+   - Utilizes `OffscreenCanvas` and HTML5 Canvas 2D rasterization to strip all ancillary metadata chunks while preserving exact image fidelity.
+   - Parses EXIF, IPTC, and XMP structures in real-time via `ExifReader` without sending bytes over the network.
+   - Video and audio streams are processed using client-side `@ffmpeg/ffmpeg` WebAssembly compilation.
+
+2. **Stateless Fallback Processing (Optional)**:
+   - For edge formats requiring specialized binary transforms, an ephemeral serverless route backed by `sharp` processes the buffer in volatile memory.
+   - Buffers are discarded immediately after response streaming; no files are saved to disk or persistent databases.
+
+---
+
+## 🧰 Technology Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **Language**: [TypeScript 5.8](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with CSS variables
+- **Component Primitives**: [Radix UI](https://www.radix-ui.com/) & [Base UI](https://base-ui.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Motion & Animations**: [Motion](https://motion.dev/)
+- **Image Processing**: HTML5 Canvas API, [Sharp](https://sharp.pixelplumbing.com/)
+- **Metadata Parsing**: [ExifReader](https://github.com/mattiasw/ExifReader)
+- **Media Transcoding**: [@ffmpeg/ffmpeg WebAssembly](https://ffmpegwasm.netlify.app/)
+- **Archive Generation**: [JSZip](https://stuk.github.io/jszip/)
+- **Crop & Redaction**: [React Image Crop](https://github.com/DominicTobias/react-image-crop)
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-Ensure you have Node.js 18.17 or later installed.
+- **Node.js**: `v20.x` or higher (`v22+` recommended)
+- **pnpm**: `v9` or higher (`v10+` recommended)
+- **Git**
 
 ### Installation
 
-1. **Clone the repository**
+1. **Clone the repository**:
    ```bash
-   git clone https://github.com/mrashed21/meta-data-remover.git
-   cd meta-data-remover
+   git clone https://github.com/mrashed21/zerometa.git
+   cd zerometa
    ```
 
-2. **Install dependencies**
+2. **Install dependencies**:
    ```bash
-   npm install
+   pnpm install
    ```
 
-3. **Start the development server**
+3. **Configure environment variables**:
    ```bash
-   npm run dev
+   cp .env.example .env.local
+   ```
+   *(All default environment settings work out of the box for local development. No external API keys or credentials are required.)*
+
+4. **Start the local development server**:
+   ```bash
+   pnpm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Icons**: Lucide React
-- **Animations**: Framer Motion
-- **Media Processing**: Canvas API (Client) + Sharp (Server API Routes)
-- **Archive Generation**: JSZip
-
-## 📈 Deployment (Vercel)
-
-The easiest way to deploy this Next.js application is via Vercel.
-
-1. Create a free account on [Vercel](https://vercel.com/).
-2. Push your code to a GitHub repository.
-3. Import the repository into your Vercel dashboard.
-4. Click **Deploy**. Vercel will automatically configure the build settings (`npm run build`). No environment variables are necessary as this app runs completely statelessly!
-
-## 👨‍💻 Author
-
-**Muhammad Rashed**
-- GitHub: [@mrashed21](https://github.com/mrashed21)
-- LinkedIn: [mrashed21](https://linkedin.com/in/mrashed21)
-- Facebook: [mrashed21](https://facebook.com/mrasheed21)
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-*Built with ❤️ in Bangladesh.*
+## ⚙️ Environment Variables
+
+The project includes a `.env.example` template with configurable public variables:
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SITE_URL` | `https://www.zerometa.tech` | Canonical deployment URL used for Open Graph and metadata |
+| `NEXT_PUBLIC_APP_NAME` | `ZeroMeta` | Brand application title |
+| `NEXT_PUBLIC_CREATOR_NAME` | `Muhammad Rashed` | Founder and author attribution |
+| `NEXT_PUBLIC_SOFTWARE_NAME` | `ZeroMeta — Digital Media Privacy Toolkit` | Full software suite title |
+| `NEXT_PUBLIC_GITHUB_URL` | `https://github.com/mrashed21/zerometa` | Repository reference link |
+
+---
+
+## 🧪 Build & Verification Commands
+
+```bash
+# Start local development server with Turbopack
+pnpm run dev
+
+# Run ESLint validation
+pnpm run lint
+
+# Run TypeScript static type checking
+pnpm exec tsc --noEmit
+
+# Run automated unit test suite
+pnpm test
+
+# Build production bundle
+pnpm run build
+
+# Start production server
+pnpm start
+```
+
+---
+
+## 🔒 Truth in Privacy & Limitations
+
+At ZeroMeta, we prioritize engineering accuracy over marketing hype:
+
+1. **Metadata vs. Pixel Content**:
+   - Stripping metadata removes file header tags (EXIF, IPTC, XMP, GPS timestamps, camera serial numbers).
+   - Metadata cleaning does **not** erase visual text, printed timestamps, or logo watermarks drawn directly into the visible image pixels. Use ZeroMeta's built-in **Redaction Tool** to obscure visible pixel regions.
+
+2. **Statistical AI Watermarks (e.g., SynthID)**:
+   - Invisible AI watermarks (such as Google DeepMind SynthID) are mathematically embedded in the pixel distribution / frequency domain, not in EXIF headers.
+   - Header stripping will **not** remove SynthID. ZeroMeta does not make fraudulent claims about erasing mathematical AI model signatures.
+
+3. **Browser Memory Caps**:
+   - Processing extremely large video files (> 500 MB) client-side can exceed available browser tab memory limits. For ultra-large video files, native desktop tools like FFmpeg CLI are recommended.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Complete white/light premium SaaS UI overhaul
+- [x] Modular tools for JPEG, PNG, WebP, GIF, TIFF, SVG, PDF, MP4, Audio
+- [x] Side-by-side visual and metadata comparison viewer
+- [x] Canvas-based interactive pixel redaction (blur/pixelate/blackout)
+- [x] Document info and XMP stream sanitizer for PDF
+- [x] Comprehensive technical guides on EXIF, GPS privacy, and metadata
+- [x] Automated QA testing suite and GitHub Actions CI workflow
+- [ ] Direct AVIF and HEIC client-side decoding via WebAssembly
+- [ ] Offline Progressive Web App (PWA) caching for zero-network operation
+- [ ] Command-line interface (`@zerometa/cli`) for local batch directory stripping
+
+---
+
+## 🤝 Contributing
+
+Contributions from the open-source community are warmly welcomed! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting pull requests.
+
+To report bugs or suggest enhancements, please use our structured [GitHub Issue Templates](https://github.com/mrashed21/zerometa/issues).
+
+---
+
+## 📄 License
+
+This project is open-source software licensed under the [MIT License](LICENSE).
+
+---
+
+## 👨‍💻 Founder & Author
+
+<div align="left">
+
+<img src="https://www.zerometa.tech/muhammad_rashed.webp" alt="Muhammad Rashed - Founder of ZeroMeta" width="96" height="96" style="border-radius: 50%;" />
+
+**Muhammad Rashed**  
+*Founder of ZeroMeta & Full Stack Developer*
+
+ZeroMeta is built by **Muhammad Rashed**, a Full Stack Developer passionate about building privacy-focused digital tools, high-performance web applications, and practical open-source software.
+
+- 🌐 **Personal Website & Portfolio**: [mrashed21.me](https://www.mrashed21.me/)
+- 💻 **Developer Website**: [muhammadrashed.dev](https://muhammadrashed.dev/)
+- 📝 **Tech Blog & Insights**: [muhammadrashed.tech](https://muhammadrashed.tech/)
+- 🐙 **GitHub Profile**: [@mrashed21](https://github.com/mrashed21)
+- 🛡️ **ZeroMeta Official Site**: [zerometa.tech](https://www.zerometa.tech/)
+
+</div>
