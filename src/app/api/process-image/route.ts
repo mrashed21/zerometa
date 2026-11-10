@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";\nimport { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
+import sharp from "sharp";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
-const MAX_UPLOAD_BYTES = MAX_SERVER_IMAGE_UPLOAD_BYTES;\nconst MAX_REQUEST_BODY_BYTES = 4.5 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = MAX_SERVER_IMAGE_UPLOAD_BYTES;
+const MAX_REQUEST_BODY_BYTES = 4.5 * 1024 * 1024;
 const MAX_INPUT_PIXELS = 40_000_000;
 const MAX_INPUT_DIMENSION = 40_000_000;
 const MAX_OUTPUT_DIMENSION = 12_000;
