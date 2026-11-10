@@ -41,6 +41,12 @@ function checkRateLimit(ip: string): boolean {
 }
 
 export function detectImageMime(buffer: Buffer): string | null {
+  if (
+    buffer.length >= 6 &&
+    (buffer.toString("ascii", 0, 6) === "GIF87a" || buffer.toString("ascii", 0, 6) === "GIF89a")
+  ) {
+    return "image/gif";
+  }
   if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
     return "image/jpeg";
   }
@@ -142,7 +148,7 @@ export async function POST(request: NextRequest) {
       return badRequest("Advanced server processing supports files up to 4MB on this deployment. Use Fast mode for larger images.", 413);
     }
 
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff", "image/gif"];
     if (!validTypes.includes(file.type)) {
       return badRequest(`Unsupported file type: ${file.type || "unknown"}`);
     }
