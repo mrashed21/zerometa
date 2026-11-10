@@ -19,14 +19,15 @@ async function getFFmpeg(): Promise<any> {
 
   ffmpeg.on("log", () => {});
 
-  const coreURL = await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript");
-  const wasmURL = await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm");
-
+  let coreURL: string | undefined;
+  let wasmURL: string | undefined;
   try {
+    coreURL = await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript");
+    wasmURL = await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm");
     await ffmpeg.load({ coreURL, wasmURL });
   } finally {
-    URL.revokeObjectURL(coreURL);
-    URL.revokeObjectURL(wasmURL);
+    if (coreURL) URL.revokeObjectURL(coreURL);
+    if (wasmURL) URL.revokeObjectURL(wasmURL);
   }
 
   ffmpegInstance = ffmpeg;
@@ -85,19 +86,20 @@ export async function processMediaFFmpeg(
   const isAudio = mediaFile.mediaType === "audio";
   const rawExtension = file.name.split(".").pop()?.toLowerCase() || (isAudio ? "mp3" : "mp4");
   const ext = rawExtension.replace(/[^a-z0-9]/g, "") || (isAudio ? "mp3" : "mp4");
-  const inputName = `input.${ext}`;
-  const outputName = `output.${ext}`;
+  const fileToken = mediaFile.id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "media";
+  const inputName = `input_${fileToken}.${ext}`;
+  const outputName = `output_${fileToken}.${ext}`;
 
   let inputWritten = false;
   let outputWritten = false;
 
   try {
     const arrayBuffer = await file.arrayBuffer();
-    await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
     inputWritten = true;
+    await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
 
-    await ffmpeg.exec(buildMetadataRemovalArgs(inputName, outputName, isAudio));
     outputWritten = true;
+    await ffmpeg.exec(buildMetadataRemovalArgs(inputName, outputName, isAudio));
     const data = await ffmpeg.readFile(outputName);
 
     const blob = new Blob([new Uint8Array(data as Uint8Array)], {
