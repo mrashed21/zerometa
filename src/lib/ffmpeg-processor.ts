@@ -7,23 +7,28 @@ async function getFFmpeg(): Promise<any> {
     throw new Error("FFmpeg processing is only available in the browser.");
   }
 
-  if (ffmpegInstance) {
-    return ffmpegInstance;
-  }
+  if (ffmpegInstance) return ffmpegInstance;
 
-  // Dynamic import via Function to avoid Turbopack static worker bundling error
+  // Keep this dynamic: statically bundling the FFmpeg worker breaks the app build.
   const ffmpegModule = await (new Function('return import("@ffmpeg/ffmpeg")')() as Promise<any>);
   const FFmpegClass = ffmpegModule.FFmpeg;
   const ffmpeg = new FFmpegClass();
 
-  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+  // Match the installed @ffmpeg/core dependency in package.json / pnpm-lock.yaml.
+  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm";
 
   ffmpeg.on("log", () => {});
 
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
-  });
+  let coreURL: string | undefined;
+  let wasmURL: string | undefined;
+  try {
+    coreURL = await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript");
+    wasmURL = await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm");
+    await ffmpeg.load({ coreURL, wasmURL });
+  } finally {
+    if (coreURL) URL.revokeObjectURL(coreURL);
+    if (wasmURL) URL.revokeObjectURL(wasmURL);
+  }
 
   ffmpegInstance = ffmpeg;
   return ffmpegInstance;
@@ -31,61 +36,75 @@ async function getFFmpeg(): Promise<any> {
 
 async function toBlobURL(url: string, mimeType: string): Promise<string> {
   const resp = await fetch(url);
+  if (!resp.ok) {
+    throw new Error(`Unable to download FFmpeg core (${resp.status}).`);
+  }
   const blob = await resp.blob();
   return URL.createObjectURL(new Blob([blob], { type: mimeType }));
 }
 
+/**
+ * FFmpeg disables global/stream metadata mapping and chapter mapping. We do
+ * not claim that every container-specific tag or attached picture was removed:
+ * stream-copy output is not independently probed for every metadata location.
+ */
+export function buildMetadataRemovalArgs(
+  inputName: string,
+  outputName: string,
+  isAudio: boolean,
+): string[] {
+  const args = [
+    "-i", inputName,
+    "-map_metadata", "-1",
+    "-map_metadata:s", "-1",
+    "-map_chapters", "-1",
+  ];
+
+  if (isAudio) {
+    args.push("-vn", "-c:a", "copy");
+  } else {
+    args.push("-c:v", "copy", "-c:a", "copy");
+  }
+
+  args.push("-fflags", "+bitexact", outputName);
+  return args;
+}
+
 export async function processMediaFFmpeg(
   mediaFile: MediaFile,
-  options: ProcessingOptions,
+  _options: ProcessingOptions,
   onProgress?: (progress: number) => void,
 ): Promise<{ blob: Blob; metadataAfter: MetadataField[] }> {
   const ffmpeg = await getFFmpeg();
 
-  const progressHandler = ({
-    progress,
-    time,
-  }: {
-    progress: number;
-    time: number;
-  }) => {
-    // progress is 0 to 1
-    if (onProgress) {
-      onProgress(Math.round(progress * 100));
-    }
+  const progressHandler = ({ progress }: { progress: number; time: number }) => {
+    if (onProgress) onProgress(Math.round(progress * 100));
   };
   ffmpeg.on("progress", progressHandler);
 
-  try {
-    const file = mediaFile.file;
-    const isAudio = mediaFile.mediaType === "audio";
-    const ext =
-      file.name.split(".").pop()?.toLowerCase() || (isAudio ? "mp3" : "mp4");
-    const inputName = `input.${ext}`;
-    const outputName = `output.${ext}`;
+  const file = mediaFile.file;
+  const isAudio = mediaFile.mediaType === "audio";
+  const rawExtension = file.name.split(".").pop()?.toLowerCase() || (isAudio ? "mp3" : "mp4");
+  const ext = rawExtension.replace(/[^a-z0-9]/g, "") || (isAudio ? "mp3" : "mp4");
+  const fileToken = mediaFile.id.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64) || "media";
+  const inputName = `input_${fileToken}.${ext}`;
+  const outputName = `output_${fileToken}.${ext}`;
 
+  let inputWritten = false;
+  let outputWritten = false;
+
+  try {
     const arrayBuffer = await file.arrayBuffer();
+    inputWritten = true;
     await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
 
-    const args = ["-i", inputName, "-map_metadata", "-1"];
-
-    if (isAudio) {
-      args.push("-vn", "-c:a", "copy");
-    } else {
-      args.push("-c:v", "copy", "-c:a", "copy");
-    }
-
-    args.push("-fflags", "+bitexact", outputName);
-
-    await ffmpeg.exec(args);
-
+    outputWritten = true;
+    await ffmpeg.exec(buildMetadataRemovalArgs(inputName, outputName, isAudio));
     const data = await ffmpeg.readFile(outputName);
 
-    await ffmpeg.deleteFile(inputName);
-    await ffmpeg.deleteFile(outputName);
-
-    const uint8Array = data as Uint8Array;
-    const blob = new Blob([uint8Array as any], { type: file.type });
+    const blob = new Blob([new Uint8Array(data as Uint8Array)], {
+      type: file.type || (isAudio ? "audio/mpeg" : "video/mp4"),
+    });
 
     const metadataAfter: MetadataField[] = [
       {
@@ -102,50 +121,58 @@ export async function processMediaFFmpeg(
       },
       {
         key: "MIME Type",
-        value: file.type,
+        value: blob.type,
+        category: "other",
+        stripped: false,
+      },
+      ...(!isAudio
+        ? [{
+            key: "Video Stream",
+            value: "Preserved (stream copy)",
+            category: "other" as const,
+            stripped: false,
+          }]
+        : []),
+      {
+        key: "Audio Stream",
+        value: "Preserved (stream copy)",
+        category: "other",
+        stripped: false,
+      },
+      {
+        key: "Global / Stream Metadata",
+        value: "Metadata mapping disabled; output not independently probed",
+        category: "camera",
+        stripped: false,
+      },
+      {
+        key: "Chapter Metadata",
+        value: "Chapter mapping disabled",
+        category: "other",
+        stripped: true,
+      },
+      {
+        key: "Embedded Artwork / Posters",
+        value: "Not independently verified; may be retained depending on container",
+        category: "other",
+        stripped: false,
+      },
+      {
+        key: "Container-specific Tags",
+        value: "Not independently verified",
         category: "other",
         stripped: false,
       },
     ];
 
-    if (!isAudio) {
-      metadataAfter.push({
-        key: "Video Stream",
-        value: "Preserved (Stream Copy)",
-        category: "other",
-        stripped: false,
-      });
-    }
-
-    metadataAfter.push(
-      {
-        key: "Audio Stream",
-        value: "Preserved (Stream Copy)",
-        category: "other",
-        stripped: false,
-      },
-      {
-        key: isAudio ? "ID3 Tags / Metadata" : "Global Metadata",
-        value: "Stripped ✓",
-        category: "camera",
-        stripped: true,
-      },
-      {
-        key: "Cover Art / Posters",
-        value: "Stripped ✓",
-        category: "other",
-        stripped: true,
-      },
-      {
-        key: "Title / Comments",
-        value: "Stripped ✓",
-        category: "other",
-        stripped: true,
-      },
-    );
-
     return { blob, metadataAfter };
   } finally {
+    if (inputWritten) {
+      try { await ffmpeg.deleteFile(inputName); } catch { /* best-effort cleanup */ }
+    }
+    if (outputWritten) {
+      try { await ffmpeg.deleteFile(outputName); } catch { /* best-effort cleanup */ }
+    }
     ffmpeg.off("progress", progressHandler);
   }
 }

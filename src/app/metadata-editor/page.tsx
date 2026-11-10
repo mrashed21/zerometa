@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
 import { UniversalUploader } from "@/components/universal-uploader";
 import { downloadBlob } from "@/lib/download";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
 import { getMediaType } from "@/lib/media-types";
 import type { MediaFile } from "@/lib/types";
 import { extractUnifiedMetadata } from "@/lib/unified-processor";
@@ -111,49 +112,49 @@ export default function MetadataEditorPage() {
 
     setIsSaving(true);
     try {
-      if (activeFile.mediaType === "image") {
-        // Send to server-side sharp with clean-branding and custom fields
-        const formData = new FormData();
-        formData.append("file", activeFile.file);
-        formData.append("privacyMode", "clean-branding");
-        formData.append("author", author);
-        formData.append("title", title);
-        formData.append("keywords", keywords);
-        formData.append("copyright", copyright);
-        formData.append("description", description);
-        formData.append("software", "ZeroMeta Privacy Studio");
-
-        const resp = await fetch("/api/process-image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!resp.ok) throw new Error("Failed to process image metadata");
-
-        const blob = await resp.blob();
-        const ext = activeFile.file.name.split(".").pop() || "jpg";
-        downloadBlob(
-          blob,
-          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
-        );
-
-        toast({
-          title: "Metadata Updated",
-          description: "Downloaded sanitized file with custom tags.",
-          variant: "success",
-        });
-      } else {
-        // For documents/audio, download with sanitized copy
-        downloadBlob(
-          activeFile.file,
-          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${activeFile.file.name.split(".").pop()}`,
-        );
-        toast({
-          title: "File Saved",
-          description: "Updated tags registered.",
-          variant: "success",
-        });
+      if (activeFile.mediaType !== "image") {
+        throw new Error("Metadata editing is currently supported for images only.");
       }
+      if (activeFile.file.size > MAX_SERVER_IMAGE_UPLOAD_BYTES) {
+        throw new Error("Metadata editing supports images up to 4 MB on this deployment.");
+      }
+
+      const formData = new FormData();
+      formData.append("file", activeFile.file);
+      formData.append("privacyMode", "clean-branding");
+
+      const inputExtension = activeFile.file.name.split(".").pop()?.toLowerCase() || "";
+      const outputFormat = ["png", "webp"].includes(inputExtension) ? inputExtension : "jpeg";
+      formData.append("format", outputFormat);
+      formData.append("author", author);
+      formData.append("title", title);
+      formData.append("keywords", keywords);
+      formData.append("copyright", copyright);
+      formData.append("description", description);
+      formData.append("software", "ZeroMeta Privacy Studio");
+
+      const resp = await fetch("/api/process-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!resp.ok) {
+        const error = await resp.json().catch(() => ({}));
+        throw new Error(error.error || "Failed to process image metadata.");
+      }
+
+      const blob = await resp.blob();
+      const ext = outputFormat === "jpeg" ? "jpg" : outputFormat;
+      downloadBlob(
+        blob,
+        `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
+      );
+
+      toast({
+        title: "Metadata Updated",
+        description: "Downloaded sanitized file with custom tags.",
+        variant: "success",
+      });
     } catch (err) {
       toast({
         title: "Update Failed",
@@ -170,13 +171,13 @@ export default function MetadataEditorPage() {
     <ToolShell
       title="Safe Metadata Editor"
       badge="Tag Customizer"
-      description="Edit and customize supported metadata properties (Author, Creator, Copyright, Description, and Title) while stripping invasive tracking headers and GPS coordinates."
+      description="Remove source image metadata and write selected authorship, copyright, title, and description fields to a new image."
       breadcrumbs={[{ label: "Metadata Editor" }]}
       howItWorks={[
         {
           step: "01",
           title: "Select File",
-          desc: "Upload the media file whose public copyright or authorship tags you wish to update.",
+          desc: "Upload an image whose public copyright or authorship tags you wish to update.",
         },
         {
           step: "02",
@@ -186,38 +187,24 @@ export default function MetadataEditorPage() {
         {
           step: "03",
           title: "Export Sanitized File",
-          desc: "ZeroMeta strips all device/GPS tags and writes only your specified public metadata.",
+          desc: "ZeroMeta removes source metadata during re-encoding, then writes the selected EXIF fields and its software tag.",
         },
       ]}
       supportedFormats={[
         {
-          format: "JPEG / JPG",
-          extension: ".jpg, .jpeg",
-          capabilities: "IFD0 Artist, Copyright, ImageDescription, Software",
-          notes: "Safely writes standard EXIF IFD0 tags.",
-        },
-        {
-          format: "PNG / WebP",
-          extension: ".png, .webp",
-          capabilities: "Standardized text chunks, XMP attribution",
-          notes:
-            "Neutralizes GPS and device serials while attaching creator credit.",
-        },
-        {
-          format: "PDF Documents",
-          extension: ".pdf",
-          capabilities: "/Title, /Author, /Subject, /Keywords",
-          notes:
-            "Updates document summary properties without modifying content.",
+          format: "JPEG / PNG / WebP / GIF / TIFF",
+          extension: ".jpg, .jpeg, .png, .webp, .gif, .tif, .tiff",
+          capabilities: "EXIF Artist, Copyright, ImageDescription, Software, Title, and Keywords",
+          notes: "Source metadata is stripped; selected EXIF fields are written to the output.",
         },
       ]}
       privacyNotes={[
-        "Only the tags you explicitly specify in the form are attached to the output file.",
-        "Invasive tags like GPS coordinates, camera serial numbers, and OS versions are permanently stripped.",
+        "Source EXIF, XMP, and IPTC metadata are not preserved; selected EXIF fields and the ZeroMeta software tag are written.",
+        "GPS coordinates and camera serial numbers from the source are not copied to the output image.",
       ]}
       limitations={[
-        "Proprietary RAW image maker notes cannot be rewritten with custom tags.",
-        "Certain media players may cache previous tags locally unless reloaded.",
+        "Metadata editing currently supports raster images only; PDF and audio metadata editing is not available in this tool.",
+        "Some output formats do not support every EXIF tag, so tag availability varies by format.",
       ]}
       faqs={[
         {
@@ -227,12 +214,15 @@ export default function MetadataEditorPage() {
       ]}
     >
       <div className="space-y-6">
+        <p className="text-xs text-muted-foreground">
+          This editor accepts images up to 4 MB on this deployment. Use the main tool&apos;s Fast mode for larger images.
+        </p>
         <UniversalUploader
           files={files}
           onFilesAdded={handleFilesAdded}
           onFileRemove={handleRemove}
           onClearAll={handleClearAll}
-          allowedType="all"
+          allowedType="image"
         />
 
         {files.length > 0 && activeFile && (
@@ -270,7 +260,7 @@ export default function MetadataEditorPage() {
                     onChange={(e) => setAuthor(e.target.value)}
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    Sets EXIF Artist / PDF Author.
+                    Sets the EXIF Artist tag.
                   </p>
                 </div>
 

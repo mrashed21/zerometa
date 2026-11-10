@@ -15,6 +15,7 @@ import type {
   ProcessingResult,
 } from "./types";
 import { getMediaType } from "./media-types";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "./constants";
 
 /**
  * Extracts metadata for any supported file format.
@@ -150,11 +151,36 @@ export async function processUnifiedMediaFile(
     const targetExt = extMap[options.format] || "jpg";
     const filename = mediaFile.customName || file.name.replace(/\.[^.]+$/, `_cleaned.${targetExt}`);
 
-    const metadataAfter: MetadataField[] = [
-      { key: "EXIF Block", value: "Stripped", category: "camera", stripped: true },
-      { key: "GPS Coordinates", value: "Removed", category: "location", stripped: true },
-      { key: "Color Profile", value: "Preserved (sRGB)", category: "other", stripped: false },
-    ];
+    const metadataMode = response.headers.get("X-Metadata-Mode");
+    const metadataAfter: MetadataField[] = metadataMode === "clean-branding"
+      ? [
+          {
+            key: "Source Metadata",
+            value: "Removed; selected branding EXIF fields written separately",
+            category: "other",
+            stripped: true,
+          },
+          {
+            key: "Branding Metadata",
+            value: "Selected branding fields applied; output not independently inspected",
+            category: "software",
+            stripped: false,
+          },
+        ]
+      : [
+          {
+            key: "Embedded Image Metadata",
+            value: "Removed during re-encoding",
+            category: "camera",
+            stripped: true,
+          },
+          {
+            key: "Color Profile",
+            value: "Output converted to sRGB by default",
+            category: "other",
+            stripped: false,
+          },
+        ];
 
     return {
       blob,

@@ -42,6 +42,9 @@ export const IMAGE_ACCEPT_STRING = Object.keys(SUPPORTED_FILE_TYPES).join(",");
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
+// Vercel Functions cap buffered request bodies at 4.5 MB; leave room for multipart overhead.
+export const MAX_SERVER_IMAGE_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB
+
 export const MAX_QUEUE_SIZE = 50;
 
 export const FORMAT_LABELS: Record<string, string> = {

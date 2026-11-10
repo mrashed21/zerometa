@@ -1,152 +1,201 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
+import { detectImageMime, safeOutputFilename } from "@/lib/image-validation";
 
 export const runtime = "nodejs";
 
-// Simple in-memory sliding window rate limiter
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_UPLOAD_BYTES = MAX_SERVER_IMAGE_UPLOAD_BYTES;
+const MAX_REQUEST_BODY_BYTES = 4.5 * 1024 * 1024;
+const MAX_INPUT_PIXELS = 40_000_000;
+const MAX_INPUT_DIMENSION = 40_000_000;
+const MAX_OUTPUT_DIMENSION = 12_000;
+const MAX_OUTPUT_PIXELS = 40_000_000;
+const MAX_NOISE_PIXELS = 16_000_000;
+const RATE_LIMIT_WINDOW = 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 30;
+
+// Best-effort per-instance limiter. Production deployments should also enforce
+// rate limits at the edge because serverless instances do not share this map.
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
-  const record = rateLimitMap.get(ip);
 
-  // Clean old entries periodically
   if (rateLimitMap.size > 1000) {
-    for (const [key, val] of rateLimitMap.entries()) {
-      if (val.resetAt < now) rateLimitMap.delete(key);
+    for (const [key, value] of rateLimitMap) {
+      if (value.resetAt < now) rateLimitMap.delete(key);
+    }
+    while (rateLimitMap.size > 1000) {
+      const oldestKey = rateLimitMap.keys().next().value;
+      if (!oldestKey) break;
+      rateLimitMap.delete(oldestKey);
     }
   }
 
+  const record = rateLimitMap.get(ip);
   if (!record || record.resetAt < now) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
     return true;
   }
-
-  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-    return false;
-  }
-
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) return false;
   record.count++;
   return true;
 }
 
+function readNumber(
+  formData: FormData,
+  key: string,
+  fallback: number,
+  min: number,
+  max: number,
+  integer = false,
+): number {
+  const value = formData.get(key);
+  if (value === null) return fallback;
+  if (typeof value !== "string" || value.trim() === "") throw new Error(`Invalid ${key} value.`);
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
+    throw new Error(`${key} must be between ${min} and ${max}.`);
+  }
+  if (integer && !Number.isInteger(parsed)) {
+    throw new Error(`${key} must be a whole number.`);
+  }
+  return parsed;
+}
+
+function badRequest(message: string, status = 400) {
+  return NextResponse.json({ error: message }, { status });
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate Limiting Check
+    // Reject oversized requests before multipart parsing when Content-Length is
+    // available. The platform/proxy must also enforce a body limit because
+    // chunked requests may omit this header.
+    const contentLengthHeader = request.headers.get("content-length");
+    if (contentLengthHeader) {
+      const contentLength = Number(contentLengthHeader);
+      if (!Number.isFinite(contentLength) || contentLength < 0) {
+        return badRequest("Invalid request content length.");
+      }
+      if (contentLength > MAX_REQUEST_BODY_BYTES) {
+        return badRequest("Request body exceeds the 4.5MB serverless request limit.", 413);
+      }
+    }
+
+    // This header is expected to be set by the hosting proxy. Keep edge-level
+    // rate limiting enabled as well; this in-memory limiter is per instance.
     const clientIp =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||
-      "127.0.0.1";
+      "unknown";
 
-    if (!checkRateLimit(clientIp)) {
+    if (clientIp !== "unknown" && !checkRateLimit(clientIp)) {
       return NextResponse.json(
         { error: "Too many processing requests. Please wait a minute before retrying." },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": "60",
-          },
-        }
+        { status: 429, headers: { "Retry-After": "60" } },
       );
     }
 
     const formData = await request.formData();
-    const file = formData.get("file") as File | null;
-
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    const file = formData.get("file");
+    if (!(file instanceof File)) {
+      return badRequest("No valid image file was provided.");
+    }
+    if (file.size === 0) return badRequest("The uploaded file is empty.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return badRequest("Advanced server processing supports files up to 4MB on this deployment. Use Fast mode for larger images.", 413);
     }
 
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff", "image/gif"];
     if (!validTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: `Unsupported file type: ${file.type}` },
-        { status: 400 },
-      );
+      return badRequest(`Unsupported file type: ${file.type || "unknown"}`);
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: "File size exceeds 50MB limit" },
-        { status: 400 },
-      );
+    const inputBuffer = Buffer.from(await file.arrayBuffer());
+    const detectedMime = detectImageMime(inputBuffer);
+    if (!detectedMime || detectedMime !== file.type) {
+      return badRequest("The file content does not match its declared image type.");
     }
 
-    const format = (formData.get("format") as string) || "jpeg";
-    const quality = parseInt(formData.get("quality") as string) || 95;
-    const microCrop = parseInt(formData.get("microCrop") as string) || 0;
-    const colorShift = parseFloat(formData.get("colorShift") as string) || 0;
-    const noiseInjection =
-      parseFloat(formData.get("noiseInjection") as string) || 0;
-    const privacyMode =
-      (formData.get("privacyMode") as string) || "privacy-clean";
+    const originalMeta = await sharp(inputBuffer, {
+      failOn: "error",
+      limitInputPixels: MAX_INPUT_PIXELS,
+      pages: 1,
+    }).metadata();
 
-    const cropX = formData.has("cropX")
-      ? parseFloat(formData.get("cropX") as string)
-      : null;
-    const cropY = formData.has("cropY")
-      ? parseFloat(formData.get("cropY") as string)
-      : null;
-    const cropW = formData.has("cropW")
-      ? parseFloat(formData.get("cropW") as string)
-      : null;
-    const cropH = formData.has("cropH")
-      ? parseFloat(formData.get("cropH") as string)
-      : null;
+    if (!originalMeta.width || !originalMeta.height) {
+      return badRequest("The image dimensions could not be read.");
+    }
+    if (originalMeta.width * originalMeta.height > MAX_INPUT_PIXELS) {
+      return badRequest("Image dimensions exceed the 40-megapixel processing limit.", 413);
+    }
+
+    const format = String(formData.get("format") || "jpeg").toLowerCase();
+    const quality = readNumber(formData, "quality", 95, 1, 100, true);
+    const microCrop = readNumber(formData, "microCrop", 0, 0, 1000, true);
+    const colorShift = readNumber(formData, "colorShift", 0, -100, 100);
+    const noiseInjection = readNumber(formData, "noiseInjection", 0, 0, 100);
+    const privacyMode = String(formData.get("privacyMode") || "privacy-clean");
+
+    if (!["privacy-clean", "clean-branding"].includes(privacyMode)) {
+      return badRequest("Unsupported privacy mode.");
+    }
+
+    const cropKeys = ["cropX", "cropY", "cropW", "cropH"];
+    const suppliedCropKeys = cropKeys.filter((key) => formData.has(key));
+    if (suppliedCropKeys.length !== 0 && suppliedCropKeys.length !== cropKeys.length) {
+      return badRequest("All four crop values must be provided together.");
+    }
 
     const resizeEnabled = formData.get("resizeEnabled") === "true";
     const resizeWParam = formData.has("resizeW")
-      ? parseInt(formData.get("resizeW") as string)
+      ? readNumber(formData, "resizeW", 0, 1, MAX_OUTPUT_DIMENSION, true)
       : null;
     const resizeHParam = formData.has("resizeH")
-      ? parseInt(formData.get("resizeH") as string)
+      ? readNumber(formData, "resizeH", 0, 1, MAX_OUTPUT_DIMENSION, true)
       : null;
-    const resizeMaintainAspect =
-      formData.get("resizeMaintainAspect") !== "false";
+    const resizeMaintainAspect = formData.get("resizeMaintainAspect") !== "false";
     const resizePreset = formData.get("resizePreset") as string | null;
     const resizeModeParam = formData.get("resizeMode") as string | null;
 
-    const arrayBuffer = await file.arrayBuffer();
-    const inputBuffer = Buffer.from(arrayBuffer);
-
-    const originalMeta = await sharp(inputBuffer).metadata();
-
-    let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
-
-    let currentWidth = originalMeta.width || 0;
-    let currentHeight = originalMeta.height || 0;
-
-    if (originalMeta.orientation && originalMeta.orientation >= 5) {
-      currentWidth = originalMeta.height || 0;
-      currentHeight = originalMeta.width || 0;
+    if (resizePreset && !["original", "custom", "1:1", "16:9", "9:16", "1920", "1280", "1080", "720"].includes(resizePreset)) {
+      return badRequest("Unsupported resize preset.");
+    }
+    if (resizeModeParam && !["fit", "fill", "crop", "stretch"].includes(resizeModeParam)) {
+      return badRequest("Unsupported resize mode.");
     }
 
-    if (cropW !== null && cropH !== null && cropX !== null && cropY !== null) {
-      pipeline = pipeline.extract({
-        left: Math.round(cropX),
-        top: Math.round(cropY),
-        width: Math.round(cropW),
-        height: Math.round(cropH),
-      });
-      currentWidth = Math.round(cropW);
-      currentHeight = Math.round(cropH);
+    let currentWidth = originalMeta.width;
+    let currentHeight = originalMeta.height;
+    if (originalMeta.orientation && originalMeta.orientation >= 5) {
+      [currentWidth, currentHeight] = [currentHeight, currentWidth];
+    }
+
+    let pipeline = sharp(inputBuffer, {
+      failOn: "error",
+      limitInputPixels: MAX_INPUT_PIXELS,
+      pages: 1,
+    }).rotate();
+
+    if (suppliedCropKeys.length === 4) {
+      const cropX = Math.round(readNumber(formData, "cropX", 0, 0, MAX_INPUT_DIMENSION));
+      const cropY = Math.round(readNumber(formData, "cropY", 0, 0, MAX_INPUT_DIMENSION));
+      const cropW = Math.round(readNumber(formData, "cropW", 0, 1, MAX_INPUT_DIMENSION));
+      const cropH = Math.round(readNumber(formData, "cropH", 0, 1, MAX_INPUT_DIMENSION));
+      if (cropX + cropW > currentWidth || cropY + cropH > currentHeight) {
+        return badRequest("Crop area is outside the image boundaries.");
+      }
+      pipeline = pipeline.extract({ left: cropX, top: cropY, width: cropW, height: cropH });
+      currentWidth = cropW;
+      currentHeight = cropH;
     } else if (microCrop > 0 && currentWidth && currentHeight) {
-      const cropPx = Math.min(
-        microCrop,
-        Math.floor(Math.min(currentWidth, currentHeight) / 4),
-      );
+      const cropPx = Math.min(microCrop, Math.floor(Math.min(currentWidth, currentHeight) / 4));
       const newWidth = currentWidth - cropPx * 2;
       const newHeight = currentHeight - cropPx * 2;
-
       if (newWidth > 0 && newHeight > 0) {
-        pipeline = pipeline.extract({
-          left: cropPx,
-          top: cropPx,
-          width: newWidth,
-          height: newHeight,
-        });
+        pipeline = pipeline.extract({ left: cropPx, top: cropPx, width: newWidth, height: newHeight });
         currentWidth = newWidth;
         currentHeight = newHeight;
       }
@@ -156,11 +205,7 @@ export async function POST(request: NextRequest) {
       let targetW = resizeWParam;
       let targetH = resizeHParam;
 
-      if (
-        resizePreset &&
-        resizePreset !== "original" &&
-        resizePreset !== "custom"
-      ) {
+      if (resizePreset && resizePreset !== "original" && resizePreset !== "custom") {
         if (resizePreset === "1:1") {
           const side = Math.max(currentWidth, currentHeight);
           targetW = side;
@@ -172,15 +217,13 @@ export async function POST(request: NextRequest) {
           targetH = resizeHParam || currentHeight;
           targetW = Math.round((targetH * 9) / 16);
         } else {
-          const dim = parseInt(resizePreset);
-          if (!isNaN(dim)) {
-            if (currentWidth > currentHeight) {
-              targetW = dim;
-              targetH = Math.round((currentHeight / currentWidth) * dim);
-            } else {
-              targetH = dim;
-              targetW = Math.round((currentWidth / currentHeight) * dim);
-            }
+          const dimension = Number(resizePreset);
+          if (currentWidth > currentHeight) {
+            targetW = dimension;
+            targetH = Math.round((currentHeight / currentWidth) * dimension);
+          } else {
+            targetH = dimension;
+            targetW = Math.round((currentWidth / currentHeight) * dimension);
           }
         }
       } else if (resizePreset === "original") {
@@ -188,162 +231,161 @@ export async function POST(request: NextRequest) {
         targetH = currentHeight;
       }
 
-      if (targetW || targetH) {
-        if (targetW && !targetH) {
-          targetH = resizeMaintainAspect
-            ? Math.round((currentHeight / currentWidth) * targetW)
-            : currentHeight;
-        } else if (targetH && !targetW) {
-          targetW = resizeMaintainAspect
-            ? Math.round((currentWidth / currentHeight) * targetH)
-            : currentWidth;
-        }
-
-        let sharpFit: "contain" | "cover" | "fill" | "inside" | "outside" =
-          "inside";
-        const mode = resizeModeParam || "fit";
-
-        if (mode === "stretch" || !resizeMaintainAspect) {
-          sharpFit = "fill";
-        } else if (mode === "fit") {
-          sharpFit = "inside";
-        } else if (mode === "fill" || mode === "crop") {
-          sharpFit = "cover";
-        }
-
-        pipeline = pipeline.resize({
-          width: targetW || undefined,
-          height: targetH || undefined,
-          fit: sharpFit,
-        });
-
-        if (targetW) currentWidth = targetW;
-        if (targetH) currentHeight = targetH;
+      if (targetW && !targetH) {
+        targetH = resizeMaintainAspect
+          ? Math.round((currentHeight / currentWidth) * targetW)
+          : currentHeight;
+      } else if (targetH && !targetW) {
+        targetW = resizeMaintainAspect
+          ? Math.round((currentWidth / currentHeight) * targetH)
+          : currentWidth;
       }
+
+      if (targetW && targetH) {
+        if (
+          targetW > MAX_OUTPUT_DIMENSION ||
+          targetH > MAX_OUTPUT_DIMENSION ||
+          targetW * targetH > MAX_OUTPUT_PIXELS
+        ) {
+          return badRequest("Requested output dimensions exceed the processing limit.", 413);
+        }
+
+        const mode = resizeModeParam || "fit";
+        const sharpFit: "fill" | "inside" | "cover" = mode === "stretch" || !resizeMaintainAspect
+          ? "fill"
+          : mode === "fill" || mode === "crop"
+            ? "cover"
+            : "inside";
+
+        pipeline = pipeline.resize({ width: targetW, height: targetH, fit: sharpFit });
+        if (sharpFit === "inside") {
+          const scale = Math.min(targetW / currentWidth, targetH / currentHeight);
+          currentWidth = Math.max(1, Math.round(currentWidth * scale));
+          currentHeight = Math.max(1, Math.round(currentHeight * scale));
+        } else {
+          currentWidth = targetW;
+          currentHeight = targetH;
+        }
+      }
+    }
+
+    if (
+      currentWidth > MAX_OUTPUT_DIMENSION ||
+      currentHeight > MAX_OUTPUT_DIMENSION ||
+      currentWidth * currentHeight > MAX_OUTPUT_PIXELS
+    ) {
+      return badRequest("Processed image dimensions exceed the output limit.", 413);
     }
 
     if (colorShift !== 0) {
       const brightnessFactor = 1 + colorShift / 100;
-      pipeline = pipeline.modulate({
-        brightness: brightnessFactor,
-      });
+      pipeline = pipeline.modulate({ brightness: brightnessFactor });
       const contrastFactor = 1 + (colorShift * 0.5) / 100;
       pipeline = pipeline.linear(contrastFactor, -(128 * (contrastFactor - 1)));
     }
 
-    if (noiseInjection > 0 && currentWidth > 0 && currentHeight > 0) {
-      const width = currentWidth;
-      const height = currentHeight;
-
-      if (width > 0 && height > 0) {
-        const channels = 3;
-        const noiseBuffer = Buffer.alloc(width * height * channels);
-        const intensity = noiseInjection * 2.55;
-
-        for (let i = 0; i < noiseBuffer.length; i++) {
-          noiseBuffer[i] = Math.round(128 + (Math.random() - 0.5) * intensity);
-        }
-
-        const noiseImage = await sharp(noiseBuffer, {
-          raw: { width, height, channels },
-        })
-          .png()
-          .toBuffer();
-
-        pipeline = pipeline.composite([
-          {
-            input: noiseImage,
-            blend: "soft-light" as const,
-            gravity: "northwest",
-          },
-        ]);
+    if (noiseInjection > 0) {
+      if (currentWidth * currentHeight > MAX_NOISE_PIXELS) {
+        return badRequest("Noise injection is limited to 16 megapixels. Resize the image first.", 413);
       }
+      const noiseBuffer = Buffer.alloc(currentWidth * currentHeight * 3);
+      const intensity = noiseInjection * 2.55;
+      for (let i = 0; i < noiseBuffer.length; i++) {
+        noiseBuffer[i] = Math.round(128 + (Math.random() - 0.5) * intensity);
+      }
+      const noiseImage = await sharp(noiseBuffer, {
+        raw: { width: currentWidth, height: currentHeight, channels: 3 },
+      }).png().toBuffer();
+      pipeline = pipeline.composite([{
+        input: noiseImage,
+        blend: "soft-light",
+        gravity: "northwest",
+      }]);
     }
 
     if (privacyMode === "clean-branding") {
-      const customAuthor = (formData.get("author") as string) || "";
-      const customCopyright = (formData.get("copyright") as string) || "";
-      const customDescription = (formData.get("description") as string) || "";
-      const customSoftware = (formData.get("software") as string) || "ZeroMeta Privacy Toolkit";
+      const author = String(formData.get("author") || "").slice(0, 256);
+      const copyright = String(formData.get("copyright") || "").slice(0, 256);
+      const description = String(formData.get("description") || "").slice(0, 512);
+      const software = String(formData.get("software") || "ZeroMeta Privacy Toolkit").slice(0, 256);
 
-      pipeline = pipeline.withMetadata({
-        exif: {
-          IFD0: {
-            ...(customAuthor ? { Artist: customAuthor } : {}),
-            Software: customSoftware,
-            ...(customDescription ? { ImageDescription: customDescription } : {}),
-            ...(customCopyright ? { Copyright: customCopyright } : {}),
-          },
+      const title = String(formData.get("title") || "").slice(0, 256);
+      const keywords = String(formData.get("keywords") || "").slice(0, 512);
+
+      // withExif replaces input EXIF instead of merging/preserving the source
+      // metadata. Sharp strips other metadata by default during re-encoding.
+      pipeline = pipeline.withExif({
+        IFD0: {
+          ...(author ? { Artist: author } : {}),
+          Software: software,
+          ...(description || title ? { ImageDescription: description || title } : {}),
+          ...(title ? { XPTitle: title } : {}),
+          ...(keywords ? { XPKeywords: keywords } : {}),
+          ...(copyright ? { Copyright: copyright } : {}),
         },
       });
     }
 
-    let outputBuffer: Buffer;
     const formatMap = {
       jpeg: () => pipeline.jpeg({ quality, mozjpeg: true }),
       jpg: () => pipeline.jpeg({ quality, mozjpeg: true }),
-      png: () =>
-        pipeline.png({ quality: Math.round(quality), compressionLevel: 9 }),
+      png: () => pipeline.png({ quality, compressionLevel: 9 }),
       webp: () => pipeline.webp({ quality }),
       avif: () => pipeline.avif({ quality }),
       gif: () => pipeline.gif(),
     };
-
     const formatter = formatMap[format as keyof typeof formatMap];
-    if (!formatter) {
-      return NextResponse.json(
-        { error: `Unsupported output format: ${format}` },
-        { status: 400 },
-      );
-    }
+    if (!formatter) return badRequest(`Unsupported output format: ${format}`);
 
-    outputBuffer = await formatter().toBuffer();
+    const outputBuffer = await formatter().toBuffer();
+    const outputMeta = await sharp(outputBuffer, { limitInputPixels: MAX_OUTPUT_PIXELS }).metadata();
 
     const mimeMap: Record<string, string> = {
-      jpeg: "image/jpeg",
-      jpg: "image/jpeg",
-      png: "image/png",
-      webp: "image/webp",
-      avif: "image/avif",
-      gif: "image/gif",
+      jpeg: "image/jpeg", jpg: "image/jpeg", png: "image/png",
+      webp: "image/webp", avif: "image/avif", gif: "image/gif",
     };
-
     const extMap: Record<string, string> = {
-      jpeg: "jpg",
-      jpg: "jpg",
-      png: "png",
-      webp: "webp",
-      avif: "avif",
-      gif: "gif",
+      jpeg: "jpg", jpg: "jpg", png: "png", webp: "webp", avif: "avif", gif: "gif",
     };
+    const outputFilename = safeOutputFilename(file.name, extMap[format]);
 
-    const outputFilename = file.name.replace(
-      /\.[^.]+$/,
-      `_cleaned.${extMap[format] || "jpg"}`,
-    );
+    // Stream the result so Vercel's buffered response-body limit does not
+    // reject large processed images. The request itself remains capped at 4MB.
+    const outputStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(outputBuffer));
+        controller.close();
+      },
+    });
 
-    return new NextResponse(outputBuffer as unknown as BodyInit, {
+    return new NextResponse(outputStream, {
       status: 200,
       headers: {
-        "Content-Type": mimeMap[format] || "image/jpeg",
+        "Content-Type": mimeMap[format],
         "Content-Disposition": `attachment; filename="${outputFilename}"`,
         "Cache-Control": "no-store, no-cache, must-revalidate, private",
         "X-Content-Type-Options": "nosniff",
         "X-Original-Size": String(file.size),
         "X-Processed-Size": String(outputBuffer.length),
-        "X-Original-Width": String(originalMeta.width || 0),
-        "X-Original-Height": String(originalMeta.height || 0),
-        "X-Processed-Width": String(currentWidth),
-        "X-Processed-Height": String(currentHeight),
+        "X-Original-Width": String(originalMeta.width),
+        "X-Original-Height": String(originalMeta.height),
+        "X-Processed-Width": String(outputMeta.width || currentWidth),
+        "X-Processed-Height": String(outputMeta.height || currentHeight),
+        "X-Metadata-Mode": privacyMode,
       },
     });
   } catch (error) {
     console.error("Image processing error:", error);
+    const message = error instanceof Error ? error.message : "";
+    if (
+      message.startsWith("Invalid ") ||
+      message.includes(" must be between ") ||
+      message.includes(" must be a whole number.")
+    ) {
+      return badRequest(message);
+    }
     return NextResponse.json(
-      {
-        error: "Failed to process image",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Failed to process image. Check that the file is valid and within the supported limits." },
       { status: 500 },
     );
   }
