@@ -122,7 +122,7 @@ export default function MetadataEditorPage() {
         // Send to server-side sharp with clean-branding and custom fields
         const formData = new FormData();
         formData.append("file", activeFile.file);
-        formData.append("privacyMode", "clean-branding");
+        formData.append("privacyMode", "clean-branding");\n        const inputExtension = activeFile.file.name.split(".").pop()?.toLowerCase() || "";\n        const outputFormat = ["png", "webp"].includes(inputExtension) ? inputExtension : "jpeg";\n        formData.append("format", outputFormat);
         formData.append("author", author);
         formData.append("title", title);
         formData.append("keywords", keywords);
@@ -141,7 +141,7 @@ export default function MetadataEditorPage() {
         }
 
         const blob = await resp.blob();
-        const ext = activeFile.file.name.split(".").pop() || "jpg";
+        const ext = outputFormat === "jpeg" ? "jpg" : outputFormat;
         downloadBlob(
           blob,
           `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
@@ -255,7 +255,7 @@ export default function MetadataEditorPage() {
                     onChange={(e) => setAuthor(e.target.value)}
                   />
                   <p className="text-[11px] text-muted-foreground">
-                    Sets EXIF Artist / PDF Author.
+                    Sets the EXIF Artist tag.
                   </p>
                 </div>
 
