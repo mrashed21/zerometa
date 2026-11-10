@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
 import { UniversalUploader } from "@/components/universal-uploader";
-import { downloadBlob } from "@/lib/download";
+import { downloadBlob } from "@/lib/download";\nimport { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
 import { getMediaType } from "@/lib/media-types";
 import type { MediaFile } from "@/lib/types";
 import { extractUnifiedMetadata } from "@/lib/unified-processor";
@@ -142,17 +142,6 @@ export default function MetadataEditorPage() {
           description: "Downloaded sanitized file with custom tags.",
           variant: "success",
         });
-      } else {
-        // For documents/audio, download with sanitized copy
-        downloadBlob(
-          activeFile.file,
-          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${activeFile.file.name.split(".").pop()}`,
-        );
-        toast({
-          title: "File Saved",
-          description: "Updated tags registered.",
-          variant: "success",
-        });
       }
     } catch (err) {
       toast({
@@ -170,13 +159,13 @@ export default function MetadataEditorPage() {
     <ToolShell
       title="Safe Metadata Editor"
       badge="Tag Customizer"
-      description="Edit and customize supported metadata properties (Author, Creator, Copyright, Description, and Title) while stripping invasive tracking headers and GPS coordinates."
+      description="Remove source image metadata and write selected authorship, copyright, title, and description fields to a new image."
       breadcrumbs={[{ label: "Metadata Editor" }]}
       howItWorks={[
         {
           step: "01",
           title: "Select File",
-          desc: "Upload the media file whose public copyright or authorship tags you wish to update.",
+          desc: "Upload an image whose public copyright or authorship tags you wish to update.",
         },
         {
           step: "02",
@@ -186,7 +175,7 @@ export default function MetadataEditorPage() {
         {
           step: "03",
           title: "Export Sanitized File",
-          desc: "ZeroMeta strips all device/GPS tags and writes only your specified public metadata.",
+          desc: "ZeroMeta removes source metadata during re-encoding, then writes the selected EXIF fields and its software tag.",
         },
       ]}
       supportedFormats={[
@@ -216,7 +205,7 @@ export default function MetadataEditorPage() {
         "Invasive tags like GPS coordinates, camera serial numbers, and OS versions are permanently stripped.",
       ]}
       limitations={[
-        "Proprietary RAW image maker notes cannot be rewritten with custom tags.",
+        "Metadata editing currently supports raster images only; PDF and audio metadata editing is not available in this tool.",\n        "Some output formats do not support every EXIF tag, so tag availability varies by format.",
         "Certain media players may cache previous tags locally unless reloaded.",
       ]}
       faqs={[
@@ -232,7 +221,7 @@ export default function MetadataEditorPage() {
           onFilesAdded={handleFilesAdded}
           onFileRemove={handleRemove}
           onClearAll={handleClearAll}
-          allowedType="all"
+          allowedType="image"
         />
 
         {files.length > 0 && activeFile && (
