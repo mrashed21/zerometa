@@ -215,7 +215,7 @@ export default function MetadataEditorPage() {
     >
       <div className="space-y-6">
         <p className="text-xs text-muted-foreground">
-          This editor accepts images up to 4 MB on this deployment. Use the main tool's Fast mode for larger images.
+          This editor accepts images up to 4 MB on this deployment. Use the main tool&apos;s Fast mode for larger images.
         </p>
         <UniversalUploader
           files={files}
