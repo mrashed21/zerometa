@@ -48,9 +48,9 @@ When files are shared online via messaging platforms, public marketplaces, or cl
 | Category | Formats | Processing Engine | Capabilities |
 | :--- | :--- | :--- | :--- |
 | **Images** | `JPEG`, `JPG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG` | HTML5 Canvas / WASM / Sharp | EXIF, GPS, XMP, IPTC stripping, visual metadata inspection, pixel redaction |
-| **Documents** | `PDF` | PDF Binary Sanitizer | Strips Document Info dictionary (`/Author`, `/Title`, `/Creator`), neutralizes embedded XMP streams |
-| **Video** | `MP4`, `MOV`, `WebM` | Client-side FFmpeg WASM / Stateless Worker | Strips container atoms, QuickTime metadata, GPS tracks, author info |
-| **Audio** | `MP3`, `WAV`, `OGG`, `M4A` | FFmpeg WASM / Binary Parser | Strips ID3v1, ID3v2, Vorbis comments, RIFF chunks, encoder signatures |
+| **Documents** | `PDF` | `pdf-lib` parser and rewrite | Removes standard document Info fields and the catalog-level XMP reference; other PDF metadata structures are outside the verified scope |
+| **Video** | `MP4`, `MOV`, `WebM`, `MKV` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
+| **Audio** | `MP3`, `WAV`, `OGG`, `M4A`, `AAC`, `FLAC` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
 
 ---
 
@@ -88,7 +88,7 @@ ZeroMeta employs a dual-tier processing pipeline designed around privacy, perfor
 
 2. **Stateless Fallback Processing (Optional)**:
    - For edge formats requiring specialized binary transforms, an ephemeral serverless route backed by `sharp` processes the buffer in volatile memory.
-   - Buffers are discarded immediately after response streaming; no files are saved to disk or persistent databases.
+   - The route processes the request in memory and does not intentionally write uploaded files to disk or persistent databases. The Advanced endpoint accepts images up to 4 MB because Vercel Functions limit request bodies to 4.5 MB; use Fast mode for larger images.
 
 ---
 
@@ -196,6 +196,21 @@ At ZeroMeta, we prioritize engineering accuracy over marketing hype:
 
 3. **Browser Memory Caps**:
    - Processing extremely large video files (> 500 MB) client-side can exceed available browser tab memory limits. For ultra-large video files, native desktop tools like FFmpeg CLI are recommended.
+
+
+4. **PDF Sanitization Scope**:
+   - PDF processing removes the standard document Info dictionary and the catalog-level XMP reference, then verifies those two locations.
+   - Metadata in annotations, attachments, embedded files, custom streams, and other nonstandard structures is not covered by this verification.
+
+5. **Video and Audio Sanitization Scope**:
+   - FFmpeg disables global and stream metadata mapping and disables chapter mapping while stream-copying audio/video.
+   - Attached pictures, artwork, and container-specific tags are not independently probed, so ZeroMeta does not claim that every metadata location is removed.
+
+6. **Advanced Image Upload Limit**:
+   - The server-side Advanced image endpoint accepts files up to 4 MB to stay below Vercel Functions' 4.5 MB request-body limit, including multipart overhead. Use Fast mode for larger images; it processes locally in the browser.
+
+7. **Metadata Editor Support**:
+   - The Metadata Editor currently accepts raster images only. PDF and audio metadata editing are not implemented in that tool.
 
 ---
 
