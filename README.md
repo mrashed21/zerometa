@@ -207,7 +207,7 @@ At ZeroMeta, we prioritize engineering accuracy over marketing hype:
    - Attached pictures, artwork, and container-specific tags are not independently probed, so ZeroMeta does not claim that every metadata location is removed.
 
 6. **Advanced Image Upload Limit**:
-   - The server-side Advanced image endpoint accepts files up to 4 MB to stay below Vercel Functions' 4.5 MB request-body limit, including multipart overhead. Use Fast mode for larger images; it processes locally in the browser.
+   - The server-side Advanced image endpoint accepts files up to 4 MB to stay below [Vercel Functions' 4.5 MB request-body limit](https://vercel.com/docs/errors/function_payload_too_large), including multipart overhead. Use Fast mode for larger images; it processes locally in the browser.
 
 7. **Metadata Editor Support**:
    - The Metadata Editor currently accepts raster images only. PDF and audio metadata editing are not implemented in that tool.
