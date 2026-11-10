@@ -180,10 +180,10 @@ export async function POST(request: NextRequest) {
     }).rotate();
 
     if (suppliedCropKeys.length === 4) {
-      const cropX = readNumber(formData, "cropX", 0, 0, MAX_INPUT_DIMENSION, true);
-      const cropY = readNumber(formData, "cropY", 0, 0, MAX_INPUT_DIMENSION, true);
-      const cropW = readNumber(formData, "cropW", 0, 1, MAX_INPUT_DIMENSION, true);
-      const cropH = readNumber(formData, "cropH", 0, 1, MAX_INPUT_DIMENSION, true);
+      const cropX = Math.round(readNumber(formData, "cropX", 0, 0, MAX_INPUT_DIMENSION));
+      const cropY = Math.round(readNumber(formData, "cropY", 0, 0, MAX_INPUT_DIMENSION));
+      const cropW = Math.round(readNumber(formData, "cropW", 0, 1, MAX_INPUT_DIMENSION));
+      const cropH = Math.round(readNumber(formData, "cropH", 0, 1, MAX_INPUT_DIMENSION));
       if (cropX + cropW > currentWidth || cropY + cropH > currentHeight) {
         return badRequest("Crop area is outside the image boundaries.");
       }
