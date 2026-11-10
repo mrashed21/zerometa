@@ -15,7 +15,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "test": "node scripts/test-privacy-toolkit.mjs"
+    "test": "node --test"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
