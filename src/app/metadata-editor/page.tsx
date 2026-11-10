@@ -134,7 +134,10 @@ export default function MetadataEditorPage() {
           body: formData,
         });
 
-        if (!resp.ok) {\n          const error = await resp.json().catch(() => ({}));\n          throw new Error(error.error || "Failed to process image metadata.");\n        }
+        if (!resp.ok) {
+          const error = await resp.json().catch(() => ({}));
+          throw new Error(error.error || "Failed to process image metadata.");
+        }
 
         const blob = await resp.blob();
         const ext = activeFile.file.name.split(".").pop() || "jpg";
