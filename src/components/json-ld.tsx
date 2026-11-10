@@ -13,6 +13,8 @@ export function JsonLd() {
           "https://www.mrashed21.me/",
           "https://muhammadrashed.dev/",
           "https://muhammadrashed.tech/",
+          "https://www.linkedin.com/in/mrashed21/",
+          "https://github.com/mrashed21",
         ],
         knowsAbout: [
           "Full Stack Software Development",
