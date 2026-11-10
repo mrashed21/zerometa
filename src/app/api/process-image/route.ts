@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
+import sharp from "sharp";\nimport { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
-const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = MAX_SERVER_IMAGE_UPLOAD_BYTES;\nconst MAX_REQUEST_BODY_BYTES = 4.5 * 1024 * 1024;
 const MAX_INPUT_PIXELS = 40_000_000;
 const MAX_INPUT_DIMENSION = 40_000_000;
 const MAX_OUTPUT_DIMENSION = 12_000;
@@ -113,8 +113,8 @@ export async function POST(request: NextRequest) {
       if (!Number.isFinite(contentLength) || contentLength < 0) {
         return badRequest("Invalid request content length.");
       }
-      if (contentLength > MAX_UPLOAD_BYTES + 256 * 1024) {
-        return badRequest("Request body exceeds the 50MB upload limit.", 413);
+      if (contentLength > MAX_REQUEST_BODY_BYTES) {
+        return badRequest("Request body exceeds the 4.5MB serverless request limit.", 413);
       }
     }
 
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
     if (file.size === 0) return badRequest("The uploaded file is empty.");
     if (file.size > MAX_UPLOAD_BYTES) {
-      return badRequest("File size exceeds the 50MB limit.", 413);
+      return badRequest("Advanced server processing supports files up to 4MB on this deployment. Use Fast mode for larger images.", 413);
     }
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
@@ -335,14 +335,19 @@ export async function POST(request: NextRequest) {
       const description = String(formData.get("description") || "").slice(0, 512);
       const software = String(formData.get("software") || "ZeroMeta Privacy Toolkit").slice(0, 256);
 
-      pipeline = pipeline.withMetadata({
-        exif: {
-          IFD0: {
-            ...(author ? { Artist: author } : {}),
-            Software: software,
-            ...(description ? { ImageDescription: description } : {}),
-            ...(copyright ? { Copyright: copyright } : {}),
-          },
+      const title = String(formData.get("title") || "").slice(0, 256);
+      const keywords = String(formData.get("keywords") || "").slice(0, 512);
+
+      // withExif replaces input EXIF instead of merging/preserving the source
+      // metadata. Sharp strips other metadata by default during re-encoding.
+      pipeline = pipeline.withExif({
+        IFD0: {
+          ...(author ? { Artist: author } : {}),
+          Software: software,
+          ...(description || title ? { ImageDescription: description || title } : {}),
+          ...(title ? { XPTitle: title } : {}),
+          ...(keywords ? { XPKeywords: keywords } : {}),
+          ...(copyright ? { Copyright: copyright } : {}),
         },
       });
     }
@@ -370,7 +375,16 @@ export async function POST(request: NextRequest) {
     };
     const outputFilename = safeOutputFilename(file.name, extMap[format]);
 
-    return new NextResponse(outputBuffer as unknown as BodyInit, {
+    // Stream the result so Vercel's buffered response-body limit does not
+    // reject large processed images. The request itself remains capped at 4MB.
+    const outputStream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(outputBuffer));
+        controller.close();
+      },
+    });
+
+    return new NextResponse(outputStream, {
       status: 200,
       headers: {
         "Content-Type": mimeMap[format],
