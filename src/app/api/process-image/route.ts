@@ -5,6 +5,7 @@ export const runtime = "nodejs";
 
 const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 const MAX_INPUT_PIXELS = 40_000_000;
+const MAX_INPUT_DIMENSION = 40_000_000;
 const MAX_OUTPUT_DIMENSION = 12_000;
 const MAX_OUTPUT_PIXELS = 40_000_000;
 const MAX_NOISE_PIXELS = 16_000_000;
@@ -200,19 +201,9 @@ export async function POST(request: NextRequest) {
       return badRequest("Unsupported resize mode.");
     }
 
-    const arrayBuffer = inputBuffer.buffer.slice(
-      inputBuffer.byteOffset,
-      inputBuffer.byteOffset + inputBuffer.byteLength,
-    );
-    const originalMetaAfterDecode = await sharp(arrayBuffer, {
-      failOn: "error",
-      limitInputPixels: MAX_INPUT_PIXELS,
-      pages: 1,
-    }).metadata();
-
-    let currentWidth = originalMetaAfterDecode.width || 0;
-    let currentHeight = originalMetaAfterDecode.height || 0;
-    if (originalMetaAfterDecode.orientation && originalMetaAfterDecode.orientation >= 5) {
+    let currentWidth = originalMeta.width;
+    let currentHeight = originalMeta.height;
+    if (originalMeta.orientation && originalMeta.orientation >= 5) {
       [currentWidth, currentHeight] = [currentHeight, currentWidth];
     }
 
