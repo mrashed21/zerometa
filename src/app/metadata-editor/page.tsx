@@ -118,7 +118,6 @@ export default function MetadataEditorPage() {
       if (activeFile.file.size > MAX_SERVER_IMAGE_UPLOAD_BYTES) {
         throw new Error("Metadata editing supports images up to 4 MB on this deployment.");
       }
-      {
         // Send to server-side sharp with clean-branding and custom fields
         const formData = new FormData();
         formData.append("file", activeFile.file);
@@ -155,7 +154,6 @@ export default function MetadataEditorPage() {
           description: "Downloaded sanitized file with custom tags.",
           variant: "success",
         });
-      }
     } catch (err) {
       toast({
         title: "Update Failed",
