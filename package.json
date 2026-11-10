@@ -15,7 +15,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
-    "test": "node --test"
+    "test": "node --experimental-strip-types --test"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
