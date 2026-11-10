@@ -22,7 +22,7 @@ If you discover a security vulnerability or privacy leak within ZeroMeta, please
 **Please DO NOT open a public GitHub issue for security or privacy vulnerabilities.**
 
 Instead, report the issue via:
-- **Email**: Send detailed disclosure to `mrashed21@gmail.com`
+- **Email**: Send detailed disclosure to `rashedjaman768@gmail.com`
 - **Subject**: `[ZeroMeta Security] Vulnerability Report: <Brief Description>`
 
 ### What to Include in Your Report

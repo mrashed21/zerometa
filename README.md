@@ -242,6 +242,7 @@ ZeroMeta is built by **Muhammad Rashed**, a Full Stack Developer passionate abou
 - 🌐 **Personal Website & Portfolio**: [mrashed21.me](https://www.mrashed21.me/)
 - 💻 **Developer Website**: [muhammadrashed.dev](https://muhammadrashed.dev/)
 - 📝 **Tech Blog & Insights**: [muhammadrashed.tech](https://muhammadrashed.tech/)
+- ✉️ **Contact Email**: [rashedjaman768@gmail.com](mailto:rashedjaman768@gmail.com)
 - 🐙 **GitHub Profile**: [@mrashed21](https://github.com/mrashed21)
 - 🛡️ **ZeroMeta Official Site**: [zerometa.tech](https://www.zerometa.tech/)
 

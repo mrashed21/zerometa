@@ -35,7 +35,7 @@ Project maintainers are responsible for clarifying and enforcing our standards o
 If you experience or witness unacceptable behavior, please report it privately to the project maintainer:
 
 - **Contact**: Muhammad Rashed
-- **Email**: `mrashed21@gmail.com`
+- **Email**: `rashedjaman768@gmail.com`
 
 All reports will be reviewed promptly, treated confidentially, and resolved fairly.
 

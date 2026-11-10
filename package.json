@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "ZeroMeta is an open-source, privacy-focused media metadata toolkit for inspecting and removing hidden metadata from supported files.",
-  "author": "Muhammad Rashed <mrashed21@gmail.com> (https://www.mrashed21.me/)",
+  "author": "Muhammad Rashed <rashedjaman768@gmail.com> (https://www.mrashed21.me/)",
   "homepage": "https://www.zerometa.tech",
   "repository": {
     "type": "git",
