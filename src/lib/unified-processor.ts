@@ -155,10 +155,10 @@ export async function processUnifiedMediaFile(
     const metadataAfter: MetadataField[] = metadataMode === "clean-branding"
       ? [
           {
-            key: "Metadata Handling",
-            value: "Original metadata removed; selected branding EXIF fields written",
+            key: "Source Metadata",
+            value: "Removed; selected branding EXIF fields written separately",
             category: "other",
-            stripped: false,
+            stripped: true,
           },
           {
             key: "Branding Metadata",
