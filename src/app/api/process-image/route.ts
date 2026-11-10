@@ -52,8 +52,8 @@ function readNumber(
   integer = false,
 ): number {
   const value = formData.get(key);
-  if (value === null || value === "") return fallback;
-  if (typeof value !== "string") throw new Error(`Invalid ${key} value.`);
+  if (value === null) return fallback;
+  if (typeof value !== "string" || value.trim() === "") throw new Error(`Invalid ${key} value.`);
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
     throw new Error(`${key} must be between ${min} and ${max}.`);
