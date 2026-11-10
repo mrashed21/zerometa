@@ -1,32 +1,34 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Info, Lock, Shield, Sparkles } from "lucide-react";
-import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import {
+  Shield,
+  Sparkles,
+  ChevronDown,
+  Menu,
+  X,
+  FileSearch,
+  Eraser,
+  SlidersHorizontal,
+  GitCompare,
+  Camera,
+  MapPin,
+  FileText,
+  EyeOff,
+  Layers,
+  BookOpen,
+  Lock,
+} from "lucide-react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import * as React from "react";
 
-function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-      <path d="M9 18c-4.51 2-5-2-7-2" />
-    </svg>
-  );
-}
+import { TOOLS_LIST } from "@/lib/tools-data";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [toolsDropdownOpen, setToolsDropdownOpen] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -35,91 +37,202 @@ export function Header() {
 
   return (
     <>
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "nav-surface border-b"
-          : "bg-transparent border-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* ─── Logo / Branding  */}
-        <div className="flex items-center gap-3">
-          <div className="relative group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center shadow-lg shadow-[rgba(0,200,255,0.2)] transition-transform duration-300 group-hover:scale-105">
-              <Shield className="w-5 h-5 text-white" />
+      <header
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "nav-surface border-b backdrop-blur-md bg-background/85"
+            : "bg-background/40 backdrop-blur-sm border-b border-border/40"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          {/* ─── Logo / Branding  */}
+          <Link href="/" className="flex items-center gap-3 group focus:outline-none">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center shadow-lg shadow-[rgba(0,200,255,0.2)] transition-transform duration-300 group-hover:scale-105">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-background animate-pulse" />
             </div>
-            {/* Pulsing indicator */}
-            <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-success border-2 border-background animate-pulse" />
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-bold tracking-tight text-foreground leading-tight font-sans">
-              ZeroMeta
-            </h1>
-            <p className="text-[10px] font-medium text-muted-foreground leading-none hidden sm:block uppercase tracking-widest mt-0.5">
-              Secure Media Processing
-            </p>
-          </div>
-        </div>
-
-        {/* ─── Desktop Navigation  */}
-        <div className="hidden md:flex items-center gap-6">
-          <nav className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-foreground transition-colors">How it works</a>
-            <a href="#privacy" className="hover:text-foreground transition-colors flex items-center gap-1.5">
-              <Lock className="w-3.5 h-3.5" /> Privacy first
-            </a>
-          </nav>
-          
-          <div className="w-px h-6 bg-border" />
-
-          <div className="flex items-center gap-3">
-            <div className="hidden lg:flex items-center gap-1.5 badge-brand">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span className="text-xs font-semibold">100% Client-Side</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-tight text-foreground leading-tight font-sans">
+                ZeroMeta
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground leading-none hidden sm:block uppercase tracking-widest mt-0.5">
+                Digital Privacy Studio
+              </span>
             </div>
-            <Button variant="ghost" size="icon" asChild className="rounded-full">
-              <a
-                href="https://github.com/mrashed21"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GitHub Repository"
+          </Link>
+
+          {/* ─── Desktop Navigation  */}
+          <div className="hidden md:flex items-center gap-6">
+            <nav className="flex items-center gap-5 text-sm font-medium text-muted-foreground">
+              {/* Tools Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => setToolsDropdownOpen(true)}
+                onMouseLeave={() => setToolsDropdownOpen(false)}
               >
-                <GithubIcon className="w-5 h-5" />
-              </a>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 py-2 hover:text-foreground transition-colors focus:outline-none"
+                  aria-expanded={toolsDropdownOpen}
+                >
+                  <span>Tools</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${toolsDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {toolsDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-1/2 -translate-x-1/2 w-[540px] p-3 rounded-xl bg-card border border-border shadow-2xl grid grid-cols-2 gap-1.5 z-50"
+                    >
+                      {TOOLS_LIST.map((tool) => (
+                        <Link
+                          key={tool.href}
+                          href={tool.href}
+                          className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-muted/80 transition-colors group"
+                          onClick={() => setToolsDropdownOpen(false)}
+                        >
+                          <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                            <tool.icon className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
+                              {tool.title}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground line-clamp-1 leading-snug">
+                              {tool.description}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <Link href="/guides" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Privacy Guides</span>
+              </Link>
+              <Link href="/#how-it-works" className="hover:text-foreground transition-colors">
+                How It Works
+              </Link>
+              <Link href="/#privacy" className="hover:text-foreground transition-colors flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" />
+                <span>Architecture</span>
+              </Link>
+              <Link href="/#faq" className="hover:text-foreground transition-colors">
+                FAQ
+              </Link>
+            </nav>
+
+            <div className="w-px h-5 bg-border" />
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-medium">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>100% Client-Side Engine</span>
+              </div>
+              <Button asChild size="sm" className="btn-primary h-8 px-3 text-xs">
+                <Link href="/#uploader">Clean Files</Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* ─── Mobile Menu Toggle ─── */}
+          <div className="flex md:hidden items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle Navigation Menu"
+              className="rounded-lg h-9 w-9 text-foreground"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
           </div>
         </div>
+      </header>
 
-        {/* ─── Desktop Only: No Mobile Hamburger here ─── */}
-      </div>
-    </motion.header>
-    
-    {/* ─── Mobile Bottom Navigation ─── */}
-    <div className="md:hidden fixed bottom-0 inset-x-0 z-50 mobile-bottom-nav">
-      <nav className="flex items-center justify-around p-2">
-        <a href="#features" className="mobile-bottom-nav-item">
-          <Sparkles className="w-5 h-5" />
-          <span>Features</span>
-        </a>
-        <a href="#how-it-works" className="mobile-bottom-nav-item">
-          <Info className="w-5 h-5" />
-          <span>Guide</span>
-        </a>
-        <a href="#privacy" className="mobile-bottom-nav-item">
-          <Lock className="w-5 h-5" />
-          <span>Privacy</span>
-        </a>
-        <a href="https://github.com/mrashed21" target="_blank" rel="noopener noreferrer" className="mobile-bottom-nav-item">
-          <GithubIcon className="w-5 h-5" />
-          <span>GitHub</span>
-        </a>
-      </nav>
-    </div>
+      {/* ─── Mobile Slide-out Menu ─── */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden fixed top-16 inset-x-0 bg-background/98 border-b border-border shadow-2xl z-40 max-h-[calc(100vh-4rem)] overflow-y-auto px-4 py-6 flex flex-col gap-6"
+          >
+            <div className="space-y-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-2">
+                Core Privacy Tools
+              </div>
+              <div className="grid grid-cols-1 gap-1">
+                {TOOLS_LIST.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted transition-colors"
+                  >
+                    <div className="p-2 rounded-md bg-primary/10 text-primary shrink-0">
+                      <tool.icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-foreground">{tool.title}</div>
+                      <div className="text-xs text-muted-foreground truncate">{tool.description}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-border flex flex-col gap-2">
+              <Link
+                href="/guides"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 p-2.5 text-sm font-medium rounded-lg hover:bg-muted text-foreground"
+              >
+                <BookOpen className="w-4 h-4 text-primary" />
+                <span>Privacy Guides & Knowledge Base</span>
+              </Link>
+              <Link
+                href="/#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 text-sm font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                How It Works
+              </Link>
+              <Link
+                href="/#privacy"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 text-sm font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                Privacy Architecture
+              </Link>
+              <Link
+                href="/#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 text-sm font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                Frequently Asked Questions
+              </Link>
+            </div>
+
+            <div className="pt-2 border-t border-border">
+              <Button asChild className="w-full btn-primary" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/#uploader">Clean My Files Now</Link>
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

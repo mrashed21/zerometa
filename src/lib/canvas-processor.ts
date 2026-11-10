@@ -41,18 +41,10 @@ export async function extractMetadata(file: File): Promise<MetadataField[]> {
   );
   const headerText = textDecoder.decode(headerBytes);
 
-  if (headerText.includes("c2pa") || headerText.includes("C2PA")) {
+  if (headerText.includes("c2pa") || headerText.includes("C2PA") || headerText.includes("jumbf")) {
     fields.push({
-      key: "C2PA Manifest",
-      value: "Detected",
-      category: "ai",
-      stripped: false,
-    });
-  }
-  if (headerText.includes("SynthID") || headerText.includes("synthid")) {
-    fields.push({
-      key: "SynthID Watermark",
-      value: "Suspected",
+      key: "C2PA / Content Credentials",
+      value: "Present (Authenticity Manifest)",
       category: "ai",
       stripped: false,
     });

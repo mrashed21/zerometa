@@ -66,7 +66,7 @@ export interface ImageFile {
   height?: number;
 }
 
-export type MediaType = "image" | "video" | "audio";
+export type MediaType = "image" | "video" | "audio" | "document";
 
 export type PrivacyMode = "privacy-clean" | "clean-branding";
 

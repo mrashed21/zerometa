@@ -7,16 +7,26 @@ import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface CompareSliderProps {
-  originalSrc: string;
-  processedSrc: string;
+  originalSrc?: string;
+  processedSrc?: string;
+  beforeImage?: string;
+  afterImage?: string;
+  beforeLabel?: string;
+  afterLabel?: string;
   className?: string;
 }
 
 export function CompareSlider({
   originalSrc,
   processedSrc,
+  beforeImage,
+  afterImage,
+  beforeLabel = "Original",
+  afterLabel = "Cleaned",
   className,
 }: CompareSliderProps) {
+  const actualOriginal = originalSrc || beforeImage || "";
+  const actualProcessed = processedSrc || afterImage || "";
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -121,8 +131,8 @@ export function CompareSlider({
         aria-valuemax={100}
       >
         <img
-          src={processedSrc}
-          alt="Processed"
+          src={actualProcessed}
+          alt={afterLabel}
           className="absolute inset-0 w-full h-full object-contain"
           draggable={false}
         />
@@ -132,8 +142,8 @@ export function CompareSlider({
           style={{ width: `${sliderPosition}%` }}
         >
           <img
-            src={originalSrc}
-            alt="Original"
+            src={actualOriginal}
+            alt={beforeLabel}
             className="absolute inset-0 w-full h-full object-contain"
             style={{
               width: containerWidth > 0 ? `${containerWidth}px` : "100%",

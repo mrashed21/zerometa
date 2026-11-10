@@ -17,28 +17,32 @@ const poppins = Poppins({
 // ─── Metadata
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mrashed21.me"),
+  metadataBase: new URL("https://www.zerometa.tech"),
   alternates: {
     canonical: "/",
   },
   title: {
-    default: "ZeroMeta — Premium Media Privacy Tool",
+    default: "ZeroMeta — Your Files. Your Privacy. Zero Metadata.",
     template: "%s | ZeroMeta",
   },
   description:
-    "Strip hidden metadata, GPS location, C2PA manifests, SynthID watermarks, and AI fingerprints from images securely.",
+    "Remove hidden metadata, GPS coordinates, device information, and unwanted digital footprints from your media files. Client-side privacy toolkit.",
   keywords: [
     "ZeroMeta",
+    "metadata remover",
     "EXIF remover",
-    "metadata cleaner",
-    "media privacy tool",
-    "GPS location remover",
-    "C2PA remover",
+    "GPS remover",
+    "remove photo location",
+    "metadata viewer",
+    "PDF metadata cleaner",
+    "privacy toolkit",
+    "media privacy",
+    "strip EXIF",
   ],
-  authors: [{ name: "Muhammad Rashed", url: "https://github.com/mrashed21" }],
-  creator: "Muhammad Rashed",
+  authors: [{ name: "ZeroMeta Privacy Team", url: "https://www.zerometa.tech" }],
+  creator: "ZeroMeta",
   publisher: "ZeroMeta",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
@@ -50,25 +54,25 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    title: "ZeroMeta — Secure Media Processing",
+    title: "ZeroMeta — Your Files. Your Privacy. Zero Metadata.",
     description:
-      "Remove EXIF metadata and AI watermarks from your images completely offline. Fast, private, seamless.",
+      "Inspect, remove, compare, and edit metadata from images, videos, audio, and documents with maximum privacy and zero tracking.",
     siteName: "ZeroMeta",
+    url: "https://www.zerometa.tech",
     images: [
       {
         url: "/icon-512.png",
         width: 512,
         height: 512,
-        alt: "ZeroMeta Logo",
+        alt: "ZeroMeta Privacy Shield Logo",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ZeroMeta — Premium Metadata Remover",
+    title: "ZeroMeta — Digital Media Privacy Toolkit",
     description:
-      "Instantly strip metadata from your photos and videos completely locally.",
-    creator: "@mrashed21",
+      "Strip EXIF, GPS location, and sensitive device data from images, videos, audio, and PDFs.",
     images: ["/icon-512.png"],
   },
   robots: {

@@ -19,7 +19,7 @@ interface UniversalUploaderProps {
   onClearAll: () => void;
   onFileEdit?: (id: string) => void;
   disabled?: boolean;
-  allowedType?: "image" | "video" | "audio";
+  allowedType?: "image" | "video" | "audio" | "document" | "all";
 }
 
 export function UniversalUploader({
@@ -29,7 +29,7 @@ export function UniversalUploader({
   onClearAll,
   onFileEdit,
   disabled = false,
-  allowedType = "image",
+  allowedType = "all",
 }: UniversalUploaderProps) {
   const { toast } = useToast();
 
@@ -38,7 +38,7 @@ export function UniversalUploader({
       if (fileRejections.length > 0) {
         toast({
           title: "Invalid files detected",
-          description: `Some files were rejected before validation.`,
+          description: `Some files could not be accepted. Supported: JPG, PNG, WebP, GIF, TIFF, MP4, MOV, WebM, MKV, MP3, WAV, FLAC, M4A, OGG, PDF.`,
           variant: "error",
         });
       }
@@ -71,9 +71,12 @@ export function UniversalUploader({
     [files, onFilesAdded, toast],
   );
 
-  const acceptRegistry = ALL_SUPPORTED_TYPES.filter(
-    (type) => type.mediaType === allowedType,
-  ).reduce(
+  const filteredTypes =
+    allowedType === "all"
+      ? ALL_SUPPORTED_TYPES
+      : ALL_SUPPORTED_TYPES.filter((type) => type.mediaType === allowedType);
+
+  const acceptRegistry = filteredTypes.reduce(
     (acc, curr) => {
       if (!acc[curr.mime]) {
         acc[curr.mime] = [];
@@ -185,8 +188,8 @@ export function UniversalUploader({
                     <p className="text-sm font-semibold text-foreground">
                       {isDragActive ? "Drop files here" : "Add more files"}
                     </p>
-                    <p className="text-xs text-[#A1A1AA]">
-                      Images (50MB), Videos (500MB), Audio (100MB)
+                    <p className="text-xs text-muted-foreground">
+                      Images (50MB), Videos (500MB), Audio (100MB), PDFs (50MB)
                     </p>
                   </div>
                 </div>

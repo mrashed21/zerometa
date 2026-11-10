@@ -68,6 +68,7 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
     switch (file.mediaType) {
       case "video": return <FileVideo className="w-8 h-8 text-muted-foreground/60" />;
       case "audio": return <FileAudio className="w-8 h-8 text-muted-foreground/60" />;
+      case "document": return <FileText className="w-8 h-8 text-primary/70" />;
       default: return <FileImage className="w-8 h-8 text-muted-foreground/60" />;
     }
   };
@@ -223,7 +224,7 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
 interface FileQueueProps {
   files: MediaFile[];
   onRemove: (id: string) => void;
-  onClearAll: () => void;
+  onClearAll?: () => void;
   onInspect: (id: string) => void;
   onDownload: (id: string) => void;
   onDownloadAll?: () => void;

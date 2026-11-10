@@ -10,10 +10,10 @@ import type {
 export const DEFAULT_PRIVACY_MODE: PrivacyMode = "privacy-clean";
 
 export const DEFAULT_BRANDING_CONFIG: BrandingConfig = {
-  creator: "Muhammad Rashed",
-  author: "Muhammad Rashed",
-  software: "ZeroMeta",
-  keywords: ["mrashed21", "muhammad rashed"],
+  creator: "",
+  author: "",
+  software: "ZeroMeta Toolkit",
+  keywords: [],
 };
 
 export const DEFAULT_IMAGE_OPTIONS: ImageProcessingOptions = {

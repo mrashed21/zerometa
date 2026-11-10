@@ -14,6 +14,7 @@ export const MAX_FILE_SIZE: Record<MediaType, number> = {
   image: 50 * 1024 * 1024, // 50 MB
   video: 500 * 1024 * 1024, // 500 MB
   audio: 100 * 1024 * 1024, // 100 MB
+  document: 50 * 1024 * 1024, // 50 MB
 };
 
 export const SUPPORTED_IMAGE_TYPES: SupportedMimeType[] = [
@@ -31,6 +32,12 @@ export const SUPPORTED_IMAGE_TYPES: SupportedMimeType[] = [
     label: "WebP",
   },
   { mime: "image/gif", mediaType: "image", extensions: [".gif"], label: "GIF" },
+  {
+    mime: "image/tiff",
+    mediaType: "image",
+    extensions: [".tif", ".tiff"],
+    label: "TIFF",
+  },
 ];
 
 export const SUPPORTED_VIDEO_TYPES: SupportedMimeType[] = [
@@ -74,11 +81,21 @@ export const SUPPORTED_AUDIO_TYPES: SupportedMimeType[] = [
   { mime: "audio/ogg", mediaType: "audio", extensions: [".ogg"], label: "OGG" },
 ];
 
+export const SUPPORTED_DOCUMENT_TYPES: SupportedMimeType[] = [
+  {
+    mime: "application/pdf",
+    mediaType: "document",
+    extensions: [".pdf"],
+    label: "PDF",
+  },
+];
+
 /** Flat registry of all supported media types */
 export const ALL_SUPPORTED_TYPES: SupportedMimeType[] = [
   ...SUPPORTED_IMAGE_TYPES,
   ...SUPPORTED_VIDEO_TYPES,
   ...SUPPORTED_AUDIO_TYPES,
+  ...SUPPORTED_DOCUMENT_TYPES,
 ];
 
 /** Fast lookup map: mime → SupportedMimeType */
@@ -86,19 +103,43 @@ const MIME_MAP = new Map<string, SupportedMimeType>(
   ALL_SUPPORTED_TYPES.map((t) => [t.mime, t]),
 );
 
+/** Fast lookup map: extension → SupportedMimeType */
+const EXT_MAP = new Map<string, SupportedMimeType>();
+for (const item of ALL_SUPPORTED_TYPES) {
+  for (const ext of item.extensions) {
+    EXT_MAP.set(ext.toLowerCase(), item);
+  }
+}
+
 export function getMediaType(file: File): MediaType | null {
-  const entry = MIME_MAP.get(file.type);
-  return entry?.mediaType ?? null;
+  if (file.type) {
+    const entry = MIME_MAP.get(file.type);
+    if (entry) return entry.mediaType;
+  }
+  const ext = getExtension(file.name);
+  const entryFromExt = EXT_MAP.get(ext);
+  return entryFromExt?.mediaType ?? null;
 }
 
 /** Returns true if the MIME string is in the supported registry. */
-export function isSupportedMimeType(mime: string): boolean {
-  return MIME_MAP.has(mime);
+export function isSupportedMimeType(mime: string, filename?: string): boolean {
+  if (MIME_MAP.has(mime)) return true;
+  if (filename) {
+    const ext = getExtension(filename);
+    return EXT_MAP.has(ext);
+  }
+  return false;
 }
 
-/** Returns the registry entry for a MIME string, or undefined. */
-export function getSupportedType(mime: string): SupportedMimeType | undefined {
-  return MIME_MAP.get(mime);
+/** Returns the registry entry for a MIME string or filename, or undefined. */
+export function getSupportedType(mime: string, filename?: string): SupportedMimeType | undefined {
+  const fromMime = MIME_MAP.get(mime);
+  if (fromMime) return fromMime;
+  if (filename) {
+    const ext = getExtension(filename);
+    return EXT_MAP.get(ext);
+  }
+  return undefined;
 }
 
 /** Returns true if the file's size is within the limit for its media type. */

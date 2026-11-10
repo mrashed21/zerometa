@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ZeroMeta",
+    name: "ZeroMeta — Digital Media Privacy Studio",
     short_name: "ZeroMeta",
-    description: "Remove EXIF metadata, GPS location, and watermarks.",
+    description: "Your Files. Your Privacy. Zero Metadata. Client-side media privacy toolkit.",
     start_url: "/",
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#000000",
+    background_color: "#09090b",
+    theme_color: "#09090b",
     icons: [
       {
         src: "/icon-192.png",

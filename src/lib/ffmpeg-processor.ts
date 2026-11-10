@@ -1,19 +1,27 @@
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
 import type { MediaFile, MetadataField, ProcessingOptions } from "./types";
 
-let ffmpegInstance: FFmpeg | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let ffmpegInstance: any = null;
 
-async function getFFmpeg(): Promise<FFmpeg> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getFFmpeg(): Promise<any> {
+  if (typeof window === "undefined") {
+    throw new Error("FFmpeg processing is only available in the browser.");
+  }
+
   if (ffmpegInstance) {
     return ffmpegInstance;
   }
 
-  const ffmpeg = new FFmpeg();
+  // Dynamic import via Function to avoid Turbopack static worker bundling error
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const ffmpegModule = await (new Function('return import("@ffmpeg/ffmpeg")')() as Promise<any>);
+  const FFmpegClass = ffmpegModule.FFmpeg;
+  const ffmpeg = new FFmpegClass();
 
   const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
 
-  ffmpeg.on("log", ({ message }) => {});
+  ffmpeg.on("log", () => {});
 
   await ffmpeg.load({
     coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
@@ -59,7 +67,8 @@ export async function processMediaFFmpeg(
     const inputName = `input.${ext}`;
     const outputName = `output.${ext}`;
 
-    await ffmpeg.writeFile(inputName, await fetchFile(file));
+    const arrayBuffer = await file.arrayBuffer();
+    await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
 
     const args = ["-i", inputName, "-map_metadata", "-1"];
 

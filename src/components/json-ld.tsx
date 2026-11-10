@@ -3,71 +3,67 @@ export function JsonLd() {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "WebApplication",
+        "@type": "SoftwareApplication",
         name: "ZeroMeta",
-        url: "https://mrashed21.me",
+        url: "https://www.zerometa.tech",
         description:
-          "Fast and private EXIF metadata, GPS location, and watermark remover running entirely in your browser.",
-        applicationCategory: "BrowserApplication",
-        operatingSystem: "Any",
+          "Privacy-focused digital media privacy toolkit to inspect, remove, compare, and edit EXIF, IPTC, XMP, and GPS metadata across images, videos, audio, and PDF documents completely offline.",
+        applicationCategory: "SecurityApplication",
+        operatingSystem: "Web Browser (Chrome, Safari, Firefox, Edge)",
         offers: {
           "@type": "Offer",
           price: "0",
           priceCurrency: "USD",
         },
-        author: {
-          "@id": "https://mrashed21.me/#person",
-        },
+        featureList: [
+          "Client-side EXIF removal",
+          "GPS coordinate stripping",
+          "PDF document metadata cleaner",
+          "Audio ID3 tag cleaner",
+          "Video QuickTime atom neutralizer",
+          "Face and license plate blur redaction",
+          "Before and after metadata comparison",
+        ],
       },
       {
-        "@type": "Person",
-        "@id": "https://mrashed21.me/#person",
-        name: "Muhammad Rashed",
-        url: "https://mrashed21.me",
-        sameAs: [
-          "https://github.com/mrashed21",
-          "https://linkedin.com/in/mrashed21",
-          "https://facebook.com/mrasheed21",
-        ],
-        jobTitle: "Full Stack Developer",
-        worksFor: {
-          "@type": "Organization",
-          name: "Self-employed",
-        },
+        "@type": "Organization",
+        name: "ZeroMeta Privacy",
+        url: "https://www.zerometa.tech",
+        logo: "https://www.zerometa.tech/icon-512.png",
       },
       {
         "@type": "FAQPage",
         mainEntity: [
           {
             "@type": "Question",
-            name: "Why should I remove EXIF data?",
+            name: "Why should I remove EXIF metadata before sharing photos?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Photos and videos capture hidden metadata including exact GPS coordinates, camera serial numbers, and device models. Removing this data protects your identity and exact physical location when sharing online.",
+              text: "Photos and videos automatically capture hidden metadata including exact GPS coordinates, camera serial numbers, and device models. Removing this data protects your identity and exact physical location when sharing online.",
             },
           },
           {
             "@type": "Question",
-            name: "Does it reduce my image quality?",
+            name: "Does ZeroMeta reduce image resolution or compress files?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "No. By default, ZeroMeta completely preserves your original dimensions and visual quality. You optionally select 'Optimize file size' if you wish to apply compression.",
+              text: "No. ZeroMeta preserves your original image resolution and pixel dimensions. Canvas re-encoding defaults to 95% high quality, and audio/video processing copies original streams without compression.",
             },
           },
           {
             "@type": "Question",
-            name: "Is there a file size limit?",
+            name: "Does metadata removal remove visible watermarks or SynthID?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Yes, the current batch processing engine safely supports files up to 50MB per file to prevent browser memory crashes during massive parallel tasks.",
+              text: "No. Metadata cleaning removes hidden digital header tags (EXIF, IPTC, XMP, GPS). Visible watermarks are drawn in image pixels and require pixel redaction. Invisible AI watermarks like Google SynthID are embedded in latent statistical distributions and cannot be removed via metadata stripping.",
             },
           },
           {
             "@type": "Question",
-            name: "How does Clean + Branding work?",
+            name: "Is my media uploaded to a remote server?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Clean + Branding acts as a double-pass system. First, it strictly strips all original EXIF data (GPS, camera info). Then, it safely injects 'Muhammad Rashed' as the Author/Creator tag in the IFD0 block, allowing you to protect your identity while claiming creative ownership.",
+              text: "In standard client-side mode, all processing is performed locally in your web browser using HTML5 Canvas and WebAssembly. Your files are never uploaded to any remote server or persistent database.",
             },
           },
         ],

@@ -214,13 +214,18 @@ export async function POST(request: NextRequest) {
     }
 
     if (privacyMode === "clean-branding") {
+      const customAuthor = (formData.get("author") as string) || "";
+      const customCopyright = (formData.get("copyright") as string) || "";
+      const customDescription = (formData.get("description") as string) || "";
+      const customSoftware = (formData.get("software") as string) || "ZeroMeta Privacy Toolkit";
+
       pipeline = pipeline.withMetadata({
         exif: {
           IFD0: {
-            Artist: "Muhammad Rashed",
-            Software: "mrashed21 Media Processor",
-            ImageDescription: "mrashed21, muhammad rashed",
-            Copyright: "Muhammad Rashed",
+            ...(customAuthor ? { Artist: customAuthor } : {}),
+            Software: customSoftware,
+            ...(customDescription ? { ImageDescription: customDescription } : {}),
+            ...(customCopyright ? { Copyright: customCopyright } : {}),
           },
         },
       });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import type { MetadataField } from "@/lib/types";
-import { Camera, Code, Cpu, FileSearch, MapPin, ShieldAlert, ShieldCheck } from "lucide-react";
+import { downloadBlob } from "@/lib/download";
+import { Camera, Code, Cpu, Download, FileSearch, MapPin, ShieldAlert, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 
 interface MetadataInspectorProps {
@@ -44,18 +46,73 @@ export function MetadataInspector({
   metadataAfter,
   fileName,
 }: MetadataInspectorProps) {
+  const exportReport = (format: "json" | "txt") => {
+    const reportData = {
+      filename: fileName || "media-file",
+      generatedAt: new Date().toISOString(),
+      tool: "ZeroMeta Privacy Toolkit",
+      originalMetadata: metadataBefore,
+      cleanedMetadata: metadataAfter,
+      summary: {
+        totalFieldsFound: metadataBefore.length,
+        totalFieldsCleaned: metadataBefore.length - metadataAfter.length,
+      },
+    };
+
+    if (format === "json") {
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+        type: "application/json",
+      });
+      downloadBlob(blob, `${fileName || "file"}-metadata-report.json`);
+    } else {
+      let text = `ZeroMeta Privacy Report\nFile: ${fileName || "unknown"}\nDate: ${new Date().toLocaleString()}\n\n=== EXPOSED METADATA (BEFORE) ===\n`;
+      metadataBefore.forEach((f) => {
+        text += `[${f.category.toUpperCase()}] ${f.key}: ${f.value}\n`;
+      });
+      text += `\n=== CLEANED METADATA (AFTER) ===\n`;
+      metadataAfter.forEach((f) => {
+        text += `[${f.category.toUpperCase()}] ${f.key}: ${f.value} (Stripped: ${f.stripped})\n`;
+      });
+      const blob = new Blob([text], { type: "text/plain" });
+      downloadBlob(blob, `${fileName || "file"}-metadata-report.txt`);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileSearch className="w-5 h-5 text-violet-400" />
-            Metadata Inspector
-          </DialogTitle>
-          {fileName && (
-            <DialogDescription className="truncate">
-              {fileName}
-            </DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b border-border">
+          <div>
+            <DialogTitle className="flex items-center gap-2">
+              <FileSearch className="w-5 h-5 text-primary" />
+              Metadata Inspector & Report
+            </DialogTitle>
+            {fileName && (
+              <DialogDescription className="truncate mt-1">
+                {fileName}
+              </DialogDescription>
+            )}
+          </div>
+          {metadataBefore.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportReport("json")}
+                className="h-8 text-xs gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Export JSON
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportReport("txt")}
+                className="h-8 text-xs gap-1.5"
+              >
+                Export TXT
+              </Button>
+            </div>
           )}
         </DialogHeader>
 

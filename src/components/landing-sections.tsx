@@ -131,43 +131,42 @@ export function LandingSections() {
       </section>
 
       {/* ─── PRIVACY ─── */}
-      <section className="space-y-10">
+      <section id="privacy" className="space-y-10">
         <div className="text-center space-y-4">
-          <Badge className="badge-success">Privacy First</Badge>
+          <Badge className="badge-success">Privacy Architecture</Badge>
           <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
-            Your data never leaves your device
+            Clear, transparent privacy principles
           </h2>
+          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            We clearly separate local browser execution from optional server tasks so you always know where your data lives.
+          </p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-6">
           <Card className="surface-hover">
             <CardContent className="p-6 space-y-3">
               <Lock className="w-6 h-6 status-success" />
-              <h3 className="font-medium">Client-Side Architecture</h3>
+              <h3 className="font-medium">Client-Side by Default</h3>
               <p className="text-sm text-muted-foreground">
-                In Privacy Clean mode, all processing is performed locally in
-                your browser using Canvas and WebAssembly. No files are
-                uploaded.
+                In standard mode, all metadata inspection, stripping, and editing occurs directly inside your web browser using HTML5 Canvas and local WebAssembly. Your media files never leave your computer.
               </p>
             </CardContent>
           </Card>
           <Card className="surface-hover">
             <CardContent className="p-6 space-y-3">
               <Server className="w-6 h-6 status-success" />
-              <h3 className="font-medium">Stateless Edge Processing</h3>
+              <h3 className="font-medium">Explicit Server Tasks</h3>
               <p className="text-sm text-muted-foreground">
-                When injecting custom branding, files are temporarily handled by
-                stateless edge servers. Absolutely zero logs are kept.
+                Advanced server processing (e.g. sharp image optimizations) only occurs when you specifically select it. Files are processed in memory and never saved to persistent database storage or media caches.
               </p>
             </CardContent>
           </Card>
           <Card className="surface-hover">
             <CardContent className="p-6 space-y-3">
               <Trash2 className="w-6 h-6 status-success" />
-              <h3 className="font-medium">Instant Deletion</h3>
+              <h3 className="font-medium">No Persistent Retention</h3>
               <p className="text-sm text-muted-foreground">
-                Any buffers utilized during processing are immediately wiped
-                from memory. We do not retain, store, or analyze your media.
+                We do not harvest metadata, track uploaded filenames, or store media files. Diagnostic metrics are strictly privacy-conscious and contain zero file content or sensitive EXIF tags.
               </p>
             </CardContent>
           </Card>

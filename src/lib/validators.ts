@@ -8,6 +8,7 @@ import {
   isWithinSizeLimit,
   MAX_FILE_SIZE,
 } from "./media-types";
+import { validateFileSignature } from "./signature-validator";
 import type { MediaFile, MediaType, ProcessingError } from "./types";
 
 export function validateFile(file: File): ProcessingError | null {
@@ -20,17 +21,25 @@ export function validateFile(file: File): ProcessingError | null {
     );
   }
 
-  // 2. MIME type support check
-  if (!isSupportedMimeType(file.type)) {
+  // 2. MIME type / format support check
+  if (!isSupportedMimeType(file.type, file.name)) {
     return createProcessingError(
       "UNSUPPORTED_FILE",
-      `"${getReadableType(file.type)}" files are not supported. Please upload an image, video, or audio file.`,
-      `Unsupported MIME type: ${file.type || "(empty)"} — file: ${file.name}`,
+      `"${getReadableType(file.type, file.name)}" files are not supported. Please upload an image, video, audio, or PDF document.`,
+      `Unsupported format: ${file.type || "(empty)"} — file: ${file.name}`,
     );
   }
 
   // 3. File size limit check
   const mediaType = getMediaType(file) as MediaType;
+  if (!mediaType) {
+    return createProcessingError(
+      "UNSUPPORTED_FILE",
+      `Unrecognized media type for "${file.name}".`,
+      `Unrecognized media type: ${file.name}`,
+    );
+  }
+
   if (!isWithinSizeLimit(file, mediaType)) {
     const limit = formatBytes(MAX_FILE_SIZE[mediaType]);
     const size = formatBytes(file.size);
@@ -44,6 +53,22 @@ export function validateFile(file: File): ProcessingError | null {
   // 4. Extension / MIME consistency check (warns about mismatches)
   const extensionError = validateExtension(file);
   if (extensionError) return extensionError;
+
+  return null;
+}
+
+export async function validateFileAsync(file: File): Promise<ProcessingError | null> {
+  const syncError = validateFile(file);
+  if (syncError) return syncError;
+
+  const sigResult = await validateFileSignature(file, file.type);
+  if (!sigResult.valid) {
+    return createProcessingError(
+      "CORRUPTED_FILE",
+      sigResult.error || "File signature verification failed.",
+      `Magic byte validation failed: ${sigResult.error}`,
+    );
+  }
 
   return null;
 }
@@ -136,10 +161,10 @@ function validateExtension(file: File): ProcessingError | null {
   return null;
 }
 
-function getReadableType(mime: string): string {
-  if (!mime) return "Unknown";
-  const entry = getSupportedType(mime);
+function getReadableType(mime: string, filename?: string): string {
+  const entry = getSupportedType(mime, filename);
   if (entry) return entry.label;
+  if (!mime) return "Unknown";
   const [, subtype] = mime.split("/");
   return subtype?.toUpperCase() ?? mime;
 }

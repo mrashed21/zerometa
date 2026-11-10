@@ -33,7 +33,7 @@ export interface ZipResult {
 
 export async function downloadAsZip(
   files: MediaFile[],
-  zipName = "mrashed21-processed",
+  zipName = "zerometa-cleaned",
   onProgress?: (percent: number) => void,
 ): Promise<ZipResult> {
   const completed = files.filter((f) => f.status === "done" && f.result?.blob);
