@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
       request.headers.get("x-real-ip") ||
       "unknown";
 
-    if (!checkRateLimit(clientIp)) {
+    if (clientIp !== "unknown" && !checkRateLimit(clientIp)) {
       return NextResponse.json(
         { error: "Too many processing requests. Please wait a minute before retrying." },
         { status: 429, headers: { "Retry-After": "60" } },
