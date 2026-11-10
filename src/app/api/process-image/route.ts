@@ -89,7 +89,7 @@ function readNumber(
 }
 
 export function safeOutputFilename(originalName: string, extension: string): string {
-  const base = originalName.replace(/\\.[^.]*$/, "");
+  const base = originalName.replace(/\.[^.]*$/, "");
   const safeBase = base
     .normalize("NFKC")
     .replace(/[^a-zA-Z0-9._-]+/g, "_")
