@@ -32,7 +32,7 @@ When files are shared online via messaging platforms, public marketplaces, or cl
 ## ✨ Key Features
 
 - **Multiple Processing Modes**: Fast image sanitization and supported FFmpeg media workflows run in the browser. Advanced image processing uses the application's server-side Sharp endpoint, so the selected image is transmitted to that endpoint for processing.
-- **Deep Metadata Inspection**: View complete EXIF, XMP, IPTC, GPS coordinates, device models, and maker notes before choosing to scrub.
+- **Metadata Inspection**: Inspect available EXIF, XMP, IPTC, GPS coordinates, device models, and maker notes before choosing to scrub.
 - **Multi-Format Support**: Comprehensive tools for Images (`JPEG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG`), Documents (`PDF`), Video (`MP4`, `MOV`, `WebM`), and Audio (`MP3`, `WAV`, `OGG`, `M4A`).
 - **Interactive Before/After Comparison**: Side-by-side visual difference slider and metadata comparison table verifying header removal.
 - **Interactive Visual Redaction**: Blur, pixelate, or black-out sensitive areas (faces, license plates, documents) directly in the browser.
@@ -47,7 +47,7 @@ When files are shared online via messaging platforms, public marketplaces, or cl
 
 | Category | Formats | Processing Engine | Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Images** | `JPEG`, `JPG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG` | HTML5 Canvas / WASM / Sharp | EXIF, GPS, XMP, IPTC stripping, visual metadata inspection, pixel redaction |
+| **Images** | `JPEG`, `JPG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG` | HTML5 Canvas / Sharp | Metadata stripping, selected EXIF writing, visual metadata inspection, pixel redaction |
 | **Documents** | `PDF` | `pdf-lib` parser and rewrite | Removes standard document Info fields and the catalog-level XMP reference; other PDF metadata structures are outside the verified scope |
 | **Video** | `MP4`, `MOV`, `WebM`, `MKV` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
 | **Audio** | `MP3`, `WAV`, `OGG`, `M4A`, `AAC`, `FLAC` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
