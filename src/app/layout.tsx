@@ -38,9 +38,14 @@ export const metadata: Metadata = {
     "privacy toolkit",
     "media privacy",
     "strip EXIF",
+    "Muhammad Rashed",
+    "Founder of ZeroMeta",
   ],
-  authors: [{ name: "ZeroMeta Privacy Team", url: "https://www.zerometa.tech" }],
-  creator: "ZeroMeta",
+  authors: [
+    { name: "Muhammad Rashed", url: "https://www.mrashed21.me/" },
+    { name: "ZeroMeta Privacy Team", url: "https://www.zerometa.tech" },
+  ],
+  creator: "Muhammad Rashed",
   publisher: "ZeroMeta",
   manifest: "/manifest.webmanifest",
   icons: {

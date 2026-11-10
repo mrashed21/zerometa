@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AuthorBox } from "@/components/author-box";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Camera, ShieldAlert, CheckCircle2, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
@@ -102,6 +103,9 @@ export default function WhatIsExifGuide() {
               </p>
             </section>
           </div>
+
+          {/* Author Attribution */}
+          <AuthorBox />
 
           {/* Quick CTA */}
           <div className="p-6 rounded-2xl bg-card border border-border flex flex-col sm:flex-row items-center justify-between gap-4">

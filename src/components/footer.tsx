@@ -61,9 +61,14 @@ export function Footer() {
           {/* Privacy Guides & Legal */}
           <div className="space-y-3">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">
-              Resources & Guides
+              Resources &amp; Founder
             </h4>
             <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/about" className="hover:text-foreground transition-colors font-medium text-foreground/90">
+                  About &amp; Founder
+                </Link>
+              </li>
               <li>
                 <Link href="/guides" className="hover:text-foreground transition-colors">
                   All Privacy Guides
@@ -89,13 +94,49 @@ export function Footer() {
                   Privacy Architecture
                 </Link>
               </li>
+              <li className="pt-2 border-t border-border/50">
+                <a
+                  href="https://www.mrashed21.me/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1 text-xs text-primary"
+                >
+                  <span>Personal Website &amp; Portfolio</span>
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://muhammadrashed.dev/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground transition-colors inline-flex items-center gap-1 text-xs text-primary"
+                >
+                  <span>Developer Website</span>
+                  <ExternalLink className="w-3 h-3 text-muted-foreground" />
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom bar */}
         <div className="pt-8 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} ZeroMeta (zerometa.tech). Privacy-focused digital media toolkit.</p>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <p>© {new Date().getFullYear()} ZeroMeta (zerometa.tech). Privacy-focused digital media toolkit.</p>
+            <span className="hidden sm:inline text-muted-foreground/60">•</span>
+            <p>
+              Built with privacy by{" "}
+              <a
+                href="https://www.mrashed21.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground hover:text-primary transition-colors underline font-medium"
+              >
+                Muhammad Rashed
+              </a>
+            </p>
+          </div>
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-emerald-400" />

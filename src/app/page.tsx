@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Header } from "@/components/header";
 import { TOOLS_LIST } from "@/lib/tools-data";
 import { Footer } from "@/components/footer";
+import { FounderSection } from "@/components/founder-section";
 import { UniversalUploader } from "@/components/universal-uploader";
 import { FileQueue } from "@/components/file-queue";
 import { ControlPanel } from "@/components/control-panel";
@@ -633,7 +634,10 @@ export default function Home() {
             </div>
           </section>
 
-          {/* ─── 8. STRONG FINAL CTA ─── */}
+          {/* ─── 8. FOUNDER PROFILE SECTION (SECTION 17) ─── */}
+          <FounderSection />
+
+          {/* ─── 9. STRONG FINAL CTA ─── */}
           <section className="p-8 sm:p-14 rounded-3xl bg-gradient-to-r from-card to-muted border border-border text-center space-y-6 shadow-xl">
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-sans">
               Take Control of Your Digital Privacy

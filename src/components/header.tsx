@@ -119,6 +119,9 @@ export function Header() {
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Privacy Guides</span>
               </Link>
+              <Link href="/about" className="hover:text-foreground transition-colors">
+                About
+              </Link>
               <Link href="/#how-it-works" className="hover:text-foreground transition-colors">
                 How It Works
               </Link>
@@ -201,6 +204,13 @@ export function Header() {
               >
                 <BookOpen className="w-4 h-4 text-primary" />
                 <span>Privacy Guides & Knowledge Base</span>
+              </Link>
+              <Link
+                href="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 text-sm font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+              >
+                About &amp; Founder
               </Link>
               <Link
                 href="/#how-it-works"

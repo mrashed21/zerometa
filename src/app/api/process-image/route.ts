@@ -3,8 +3,55 @@ import sharp from "sharp";
 
 export const runtime = "nodejs";
 
+// Simple in-memory sliding window rate limiter
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 30;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  // Clean old entries periodically
+  if (rateLimitMap.size > 1000) {
+    for (const [key, val] of rateLimitMap.entries()) {
+      if (val.resetAt < now) rateLimitMap.delete(key);
+    }
+  }
+
+  if (!record || record.resetAt < now) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // 1. Rate Limiting Check
+    const clientIp =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    if (!checkRateLimit(clientIp)) {
+      return NextResponse.json(
+        { error: "Too many processing requests. Please wait a minute before retrying." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": "60",
+          },
+        }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -280,6 +327,8 @@ export async function POST(request: NextRequest) {
       headers: {
         "Content-Type": mimeMap[format] || "image/jpeg",
         "Content-Disposition": `attachment; filename="${outputFilename}"`,
+        "Cache-Control": "no-store, no-cache, must-revalidate, private",
+        "X-Content-Type-Options": "nosniff",
         "X-Original-Size": String(file.size),
         "X-Processed-Size": String(outputBuffer.length),
         "X-Original-Width": String(originalMeta.width || 0),

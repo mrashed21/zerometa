@@ -3,13 +3,47 @@ export function JsonLd() {
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@type": "Person",
+        "@id": "https://www.zerometa.tech/#founder",
+        name: "Muhammad Rashed",
+        jobTitle: "Full Stack Developer",
+        image: "https://www.zerometa.tech/muhammad_rashed.webp",
+        url: "https://www.mrashed21.me/",
+        sameAs: [
+          "https://www.mrashed21.me/",
+          "https://muhammadrashed.dev/",
+          "https://github.com/mrashed21",
+          "https://linkedin.com/in/mrashed21",
+        ],
+        knowsAbout: [
+          "Full Stack Software Development",
+          "React",
+          "Next.js",
+          "Node.js",
+          "Client-Side Privacy Architecture",
+          "Metadata Sanitization",
+        ],
+      },
+      {
         "@type": "SoftwareApplication",
+        "@id": "https://www.zerometa.tech/#app",
         name: "ZeroMeta",
         url: "https://www.zerometa.tech",
         description:
           "Privacy-focused digital media privacy toolkit to inspect, remove, compare, and edit EXIF, IPTC, XMP, and GPS metadata across images, videos, audio, and PDF documents completely offline.",
         applicationCategory: "SecurityApplication",
         operatingSystem: "Web Browser (Chrome, Safari, Firefox, Edge)",
+        author: {
+          "@type": "Person",
+          "@id": "https://www.zerometa.tech/#founder",
+          name: "Muhammad Rashed",
+        },
+        founder: {
+          "@type": "Person",
+          "@id": "https://www.zerometa.tech/#founder",
+          name: "Muhammad Rashed",
+          url: "https://www.mrashed21.me/",
+        },
         offers: {
           "@type": "Offer",
           price: "0",
@@ -27,12 +61,20 @@ export function JsonLd() {
       },
       {
         "@type": "Organization",
-        name: "ZeroMeta Privacy",
+        "@id": "https://www.zerometa.tech/#organization",
+        name: "ZeroMeta",
         url: "https://www.zerometa.tech",
         logo: "https://www.zerometa.tech/icon-512.png",
+        founder: {
+          "@type": "Person",
+          "@id": "https://www.zerometa.tech/#founder",
+          name: "Muhammad Rashed",
+          url: "https://www.mrashed21.me/",
+        },
       },
       {
         "@type": "FAQPage",
+        "@id": "https://www.zerometa.tech/#faq",
         mainEntity: [
           {
             "@type": "Question",

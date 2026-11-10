@@ -186,6 +186,51 @@ export default function ImagePrivacyToolsPage() {
     startPosRef.current = null;
   };
 
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length === 0) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const coords = {
+      x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+      y: (touch.clientY - rect.top) * (canvas.height / rect.height),
+    };
+    isDrawingRef.current = true;
+    startPosRef.current = coords;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawingRef.current || !startPosRef.current || !canvasRef.current || e.changedTouches.length === 0) return;
+    isDrawingRef.current = false;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.changedTouches[0];
+    const coords = {
+      x: (touch.clientX - rect.left) * (canvas.width / rect.width),
+      y: (touch.clientY - rect.top) * (canvas.height / rect.height),
+    };
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const w = coords.x - startPosRef.current.x;
+    const h = coords.y - startPosRef.current.y;
+
+    if (Math.abs(w) > 5 && Math.abs(h) > 5) {
+      applyEffectToRect(ctx, startPosRef.current.x, startPosRef.current.y, w, h, effect);
+      const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      setHistory((prev) => [...prev, snapshot]);
+      toast({
+        title: "Area Redacted",
+        description: `Applied ${effect} to selected region.`,
+        variant: "success",
+      });
+    }
+
+    startPosRef.current = null;
+  };
+
   const handleUndo = () => {
     if (history.length <= 1 || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -358,7 +403,9 @@ export default function ImagePrivacyToolsPage() {
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
-                className="max-w-full max-h-[70vh] object-contain cursor-crosshair shadow-2xl rounded"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                className="max-w-full max-h-[70vh] object-contain cursor-crosshair shadow-2xl rounded touch-none"
               />
             </div>
           </div>

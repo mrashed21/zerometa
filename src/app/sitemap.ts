@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/image-metadata-remover", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/video-metadata-remover", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/audio-metadata-remover", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/about", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/guides", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/guides/what-is-exif", priority: 0.75, changeFrequency: "monthly" as const },
     { path: "/guides/how-to-remove-photo-location", priority: 0.75, changeFrequency: "monthly" as const },
