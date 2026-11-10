@@ -64,16 +64,6 @@ function readNumber(
   return parsed;
 }
 
-export function safeOutputFilename(originalName: string, extension: string): string {
-  const base = originalName.replace(/\.[^.]*$/, "");
-  const safeBase = base
-    .normalize("NFKC")
-    .replace(/[^a-zA-Z0-9._-]+/g, "_")
-    .replace(/^[_\.]+|[_\.]+$/g, "")
-    .slice(0, 100) || "image";
-  return `${safeBase}_cleaned.${extension}`;
-}
-
 function badRequest(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
