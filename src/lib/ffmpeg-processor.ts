@@ -97,8 +97,8 @@ export async function processMediaFFmpeg(
     inputWritten = true;
 
     await ffmpeg.exec(buildMetadataRemovalArgs(inputName, outputName, isAudio));
-    const data = await ffmpeg.readFile(outputName);
     outputWritten = true;
+    const data = await ffmpeg.readFile(outputName);
 
     const blob = new Blob([new Uint8Array(data as Uint8Array)], {
       type: file.type || (isAudio ? "audio/mpeg" : "video/mp4"),
