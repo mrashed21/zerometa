@@ -113,47 +113,47 @@ export default function MetadataEditorPage() {
     setIsSaving(true);
     try {
       if (activeFile.mediaType !== "image") {
-        throw new Error("Metadata editing is currently supported for images only.");
+      throw new Error("Metadata editing is currently supported for images only.");
       }
       if (activeFile.file.size > MAX_SERVER_IMAGE_UPLOAD_BYTES) {
-        throw new Error("Metadata editing supports images up to 4 MB on this deployment.");
+      throw new Error("Metadata editing supports images up to 4 MB on this deployment.");
       }
-        // Send to server-side sharp with clean-branding and custom fields
+      // Send to server-side sharp with clean-branding and custom fields
         const formData = new FormData();
-        formData.append("file", activeFile.file);
-        formData.append("privacyMode", "clean-branding");
+      formData.append("file", activeFile.file);
+      formData.append("privacyMode", "clean-branding");
         const inputExtension = activeFile.file.name.split(".").pop()?.toLowerCase() || "";
         const outputFormat = ["png", "webp"].includes(inputExtension) ? inputExtension : "jpeg";
-        formData.append("format", outputFormat);
-        formData.append("author", author);
-        formData.append("title", title);
-        formData.append("keywords", keywords);
-        formData.append("copyright", copyright);
-        formData.append("description", description);
-        formData.append("software", "ZeroMeta Privacy Studio");
+      formData.append("format", outputFormat);
+      formData.append("author", author);
+      formData.append("title", title);
+      formData.append("keywords", keywords);
+      formData.append("copyright", copyright);
+      formData.append("description", description);
+      formData.append("software", "ZeroMeta Privacy Studio");
 
         const resp = await fetch("/api/process-image", {
           method: "POST",
           body: formData,
-        });
+      });
 
         if (!resp.ok) {
           const error = await resp.json().catch(() => ({}));
           throw new Error(error.error || "Failed to process image metadata.");
-        }
+      }
 
         const blob = await resp.blob();
         const ext = outputFormat === "jpeg" ? "jpg" : outputFormat;
-        downloadBlob(
+      downloadBlob(
           blob,
           `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
-        );
+      );
 
-        toast({
+      toast({
           title: "Metadata Updated",
           description: "Downloaded sanitized file with custom tags.",
           variant: "success",
-        });
+      });
     } catch (err) {
       toast({
         title: "Update Failed",
