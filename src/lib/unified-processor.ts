@@ -14,7 +14,7 @@ import type {
   ProcessingOptions,
   ProcessingResult,
 } from "./types";
-import { getMediaType } from "./media-types";
+import { getMediaType } from "./media-types";\nimport { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "./constants";
 
 /**
  * Extracts metadata for any supported file format.
@@ -155,7 +155,7 @@ export async function processUnifiedMediaFile(
       ? [
           {
             key: "Metadata Handling",
-            value: "Metadata preservation enabled; original metadata may remain",
+            value: "Original metadata removed; selected branding EXIF fields written",
             category: "other",
             stripped: false,
           },
