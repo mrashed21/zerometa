@@ -86,8 +86,8 @@ ZeroMeta employs a dual-tier processing pipeline designed around privacy, perfor
    - Parses EXIF, IPTC, and XMP structures in real-time via `ExifReader` without sending bytes over the network.
    - Video and audio streams are processed using client-side `@ffmpeg/ffmpeg` WebAssembly compilation.
 
-2. **Stateless Fallback Processing (Optional)**:
-   - For edge formats requiring specialized binary transforms, an ephemeral serverless route backed by `sharp` processes the buffer in volatile memory.
+2. **Advanced Image Processing (Optional)**:
+   - The server-side image endpoint backed by `sharp` validates image signatures, limits decoded pixel counts and processing parameters, and processes the image in memory.
    - The route processes the request in memory and does not intentionally write uploaded files to disk or persistent databases. The Advanced endpoint accepts images up to 4 MB because Vercel Functions limit request bodies to 4.5 MB; use Fast mode for larger images.
 
 ---
