@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";\nimport { detectImageMime, safeOutputFilename } from "@/lib/image-validation";
+import { MAX_SERVER_IMAGE_UPLOAD_BYTES } from "@/lib/constants";
+import { detectImageMime, safeOutputFilename } from "@/lib/image-validation";
 
 export const runtime = "nodejs";
 
