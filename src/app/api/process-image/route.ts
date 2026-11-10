@@ -40,7 +40,7 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function detectImageMime(buffer: Buffer): string | null {
+export function detectImageMime(buffer: Buffer): string | null {
   if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
     return "image/jpeg";
   }
@@ -88,7 +88,7 @@ function readNumber(
   return parsed;
 }
 
-function safeOutputFilename(originalName: string, extension: string): string {
+export function safeOutputFilename(originalName: string, extension: string): string {
   const base = originalName.replace(/\\.[^.]*$/, "");
   const safeBase = base
     .normalize("NFKC")
@@ -285,15 +285,21 @@ export async function POST(request: NextRequest) {
         }
 
         const mode = resizeModeParam || "fit";
-        const sharpFit = mode === "stretch" || !resizeMaintainAspect
+        const sharpFit: "fill" | "inside" | "cover" = mode === "stretch" || !resizeMaintainAspect
           ? "fill"
           : mode === "fill" || mode === "crop"
             ? "cover"
             : "inside";
 
         pipeline = pipeline.resize({ width: targetW, height: targetH, fit: sharpFit });
-        currentWidth = targetW;
-        currentHeight = targetH;
+        if (sharpFit === "inside") {
+          const scale = Math.min(targetW / currentWidth, targetH / currentHeight);
+          currentWidth = Math.max(1, Math.round(currentWidth * scale));
+          currentHeight = Math.max(1, Math.round(currentHeight * scale));
+        } else {
+          currentWidth = targetW;
+          currentHeight = targetH;
+        }
       }
     }
 
