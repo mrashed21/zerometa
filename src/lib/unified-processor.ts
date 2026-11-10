@@ -76,48 +76,25 @@ export async function processUnifiedMediaFile(
   // 2. Video & Audio
   if (mediaType === "video" || mediaType === "audio") {
     onProgress?.(15);
-    try {
-      const { processMediaFFmpeg } = await import("./ffmpeg-processor");
-      const { blob, metadataAfter } = await processMediaFFmpeg(mediaFile, options, onProgress);
-      const ext = file.name.split(".").pop() || (mediaType === "video" ? "mp4" : "mp3");
-      const filename = file.name.replace(/\.[^.]+$/, `_cleaned.${ext}`);
+    const { processMediaFFmpeg } = await import("./ffmpeg-processor");
+    const { blob, metadataAfter } = await processMediaFFmpeg(mediaFile, options, onProgress);
+    const ext = file.name.split(".").pop() || (mediaType === "video" ? "mp4" : "mp3");
+    const filename = file.name.replace(/\.[^.]+$/, `_cleaned.${ext}`);
 
-      return {
-        blob,
-        mimeType: file.type || (mediaType === "video" ? "video/mp4" : "audio/mpeg"),
-        filename,
-        metadataAfter,
-        stats: {
-          fieldsFound: mediaFile.metadataBefore.length,
-          fieldsRemoved: Math.max(0, mediaFile.metadataBefore.length - metadataAfter.length),
-          originalSize: file.size,
-          processedSize: blob.size,
-          savedBytes: Math.max(0, file.size - blob.size),
-          savedPercent: file.size > 0 ? Math.round(((file.size - blob.size) / file.size) * 100) : 0,
-        },
-      };
-    } catch (err) {
-      console.warn("FFmpeg processing fallback to binary sanitize:", err);
-      // Fallback: safe copy with metadata tags stripped indicator
-      const blob = new Blob([await file.arrayBuffer()], { type: file.type });
-      return {
-        blob,
-        mimeType: file.type,
-        filename: file.name.replace(/\.[^.]+$/, `_cleaned.${file.name.split(".").pop()}`),
-        metadataAfter: [
-          { key: "File Name", value: file.name, category: "other", stripped: false },
-          { key: "Metadata Stream", value: "Neutralized", category: "other", stripped: true },
-        ],
-        stats: {
-          fieldsFound: mediaFile.metadataBefore.length,
-          fieldsRemoved: mediaFile.metadataBefore.length,
-          originalSize: file.size,
-          processedSize: blob.size,
-          savedBytes: 0,
-          savedPercent: 0,
-        },
-      };
-    }
+    return {
+      blob,
+      mimeType: file.type || (mediaType === "video" ? "video/mp4" : "audio/mpeg"),
+      filename,
+      metadataAfter,
+      stats: {
+        fieldsFound: mediaFile.metadataBefore.length,
+        fieldsRemoved: Math.max(0, mediaFile.metadataBefore.length - metadataAfter.length),
+        originalSize: file.size,
+        processedSize: blob.size,
+        savedBytes: Math.max(0, file.size - blob.size),
+        savedPercent: file.size > 0 ? Math.round(((file.size - blob.size) / file.size) * 100) : 0,
+      },
+    };
   }
 
   // 3. Images: Fast Mode (Canvas) or Advanced Mode (Server Sharp)
