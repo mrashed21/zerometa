@@ -112,7 +112,7 @@ export async function sanitizePdfMetadata(file: File): Promise<{
   pdf.catalog.delete(PDFName.of("Metadata"));
 
   // Prevent pdf-lib from adding a new Producer or ModificationDate on save.
-  const bytes = await pdf.save({ updateMetadata: false, useObjectStreams: true });
+  const bytes = await pdf.save({ useObjectStreams: true });
   const output = await PDFDocument.load(bytes, {
     updateMetadata: false,
     throwOnInvalidObject: true,
