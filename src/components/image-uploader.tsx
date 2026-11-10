@@ -151,7 +151,7 @@ export function ImageUploader({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ delay: index * 0.05 }}
-                className="relative group rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-square"
+                className="relative group rounded-lg overflow-hidden border border-neutral-200 bg-neutral-100 aspect-square"
               >
                 <img
                   src={imageFile.preview}
@@ -160,12 +160,12 @@ export function ImageUploader({
                 />
 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-zinc-950/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <p className="text-xs text-zinc-300 truncate">
+                    <p className="text-xs text-white truncate">
                       {imageFile.file.name}
                     </p>
-                    <p className="text-[10px] text-zinc-500">
+                    <p className="text-[10px] text-neutral-300">
                       {formatFileSize(imageFile.file.size)}
                     </p>
                   </div>
@@ -176,18 +176,18 @@ export function ImageUploader({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-7 h-7 bg-zinc-900/80 backdrop-blur-sm hover:bg-zinc-800"
+                    className="w-7 h-7 bg-white/90 backdrop-blur-sm hover:bg-white text-neutral-700 shadow-xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (onFileEdit) onFileEdit(imageFile.id);
                     }}
                   >
-                    <Edit2 className="w-3.5 h-3.5 text-zinc-300" />
+                    <Edit2 className="w-3.5 h-3.5" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="w-7 h-7 bg-zinc-900/80 backdrop-blur-sm hover:bg-red-500/80 hover:text-white"
+                    className="w-7 h-7 bg-white/90 backdrop-blur-sm hover:bg-red-600 hover:text-white text-neutral-700 shadow-xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       onFileRemove(imageFile.id);

@@ -17,29 +17,29 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-[#D8B894]",
+        default: "bg-primary text-primary-foreground shadow-sm hover:bg-blue-700",
 
         success: [
-          "bg-success text-white",
-          "shadow-[0_2px_12px_rgba(163,230,53,0.15)]",
-          "hover:bg-[#86d628]",
+          "bg-emerald-600 text-white",
+          "shadow-sm",
+          "hover:bg-emerald-700",
         ],
 
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-red-700",
 
         secondary:
-          "bg-transparent border border-border text-foreground hover:bg-[#141414]",
+          "bg-secondary border border-border text-foreground shadow-xs hover:bg-neutral-100",
 
         outline: [
-          "border border-border bg-transparent",
-          "text-foreground",
-          "hover:bg-[#141414] hover:text-foreground",
+          "border border-border bg-background",
+          "text-foreground shadow-xs",
+          "hover:bg-neutral-50 hover:text-foreground",
         ],
 
-        ghost: "text-foreground/70 hover:bg-muted hover:text-foreground",
+        ghost: "text-foreground/75 hover:bg-neutral-100 hover:text-foreground",
 
-        link: "text-[oklch(0.75_0.18_293)] underline-offset-4 hover:underline",
+        link: "text-primary underline-offset-4 hover:underline",
       },
 
       size: {

@@ -195,13 +195,13 @@ export default function PdfMetadataRemoverPage() {
     >
       <div className="space-y-6">
         {/* Important Disclaimer Notice */}
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-1 text-xs">
-            <span className="font-bold text-amber-300 uppercase tracking-wide">
+            <span className="font-bold text-amber-900 uppercase tracking-wide">
               Document Privacy Disclaimer
             </span>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-neutral-600 leading-relaxed">
               This tool sanitizes standard document properties (/Title, /Author, /Subject, /Keywords, /Creator, /Producer, /CreationDate, /ModDate) and embedded XMP metadata streams.
               <strong> Removing metadata does not guarantee removal of hidden PDF content, annotations, embedded attachment files, or underlying incremental revision history.</strong>
             </p>
@@ -219,10 +219,10 @@ export default function PdfMetadataRemoverPage() {
 
         {files.length > 0 && (
           <div className="space-y-6 pt-4 border-t border-border">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-muted/40 border border-border">
-              <div className="text-xs text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-neutral-50 border border-neutral-200">
+              <div className="text-xs text-neutral-600">
                 <span className="font-semibold text-foreground">{files.length}</span> PDF document{files.length > 1 ? "s" : ""} •{" "}
-                <span className="font-semibold text-emerald-400">{doneCount}</span> sanitized
+                <span className="font-semibold text-emerald-600">{doneCount}</span> sanitized
               </div>
 
               <div className="flex items-center gap-3">

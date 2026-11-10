@@ -23,11 +23,11 @@ import {
 } from "lucide-react";
 
 const categoryIcons: Record<string, React.ReactNode> = {
-  camera: <Camera className="w-4 h-4 text-blue-400" />,
-  location: <MapPin className="w-4 h-4 text-rose-400" />,
-  ai: <Cpu className="w-4 h-4 text-purple-400" />,
-  software: <Code className="w-4 h-4 text-amber-400" />,
-  other: <FileSearch className="w-4 h-4 text-zinc-400" />,
+  camera: <Camera className="w-4 h-4 text-blue-600" />,
+  location: <MapPin className="w-4 h-4 text-rose-600" />,
+  ai: <Cpu className="w-4 h-4 text-purple-600" />,
+  software: <Code className="w-4 h-4 text-amber-600" />,
+  other: <FileSearch className="w-4 h-4 text-neutral-500" />,
 };
 
 export default function MetadataViewerPage() {

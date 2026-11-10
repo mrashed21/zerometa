@@ -107,7 +107,7 @@ export function CompareSlider({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className={cn(
-        "relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900",
+        "relative overflow-hidden rounded-xl border border-border bg-neutral-100",
         className,
       )}
     >
@@ -155,23 +155,23 @@ export function CompareSlider({
 
         {/* Slider line */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-white/80 shadow-lg z-10"
+          className="absolute top-0 bottom-0 w-0.5 bg-blue-600 shadow-sm z-10"
           style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
         >
           {/* Handle */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing">
-            <GripVertical className="w-4 h-4 text-zinc-700" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-neutral-300 shadow-md flex items-center justify-center cursor-grab active:cursor-grabbing">
+            <GripVertical className="w-4 h-4 text-neutral-600" />
           </div>
         </div>
 
         {/* Labels */}
         <div className="absolute top-3 left-3 z-20">
-          <span className="px-2 py-1 rounded-md bg-zinc-950/80 backdrop-blur-sm text-xs font-medium text-zinc-300 border border-zinc-700/50">
+          <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-sm text-xs font-semibold text-neutral-800 border border-neutral-200 shadow-xs">
             Original
           </span>
         </div>
         <div className="absolute top-3 right-3 z-20">
-          <span className="px-2 py-1 rounded-md bg-zinc-950/80 backdrop-blur-sm text-xs font-medium text-emerald-400 border border-emerald-500/30">
+          <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-sm text-xs font-semibold text-emerald-700 border border-emerald-200 shadow-xs">
             Processed
           </span>
         </div>

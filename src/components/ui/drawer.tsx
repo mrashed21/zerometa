@@ -17,7 +17,7 @@ const DrawerOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/70 backdrop-blur-sm",
+      "fixed inset-0 z-50 bg-neutral-900/40 backdrop-blur-xs",
       "data-[state=open]:animate-in  data-[state=open]:fade-in-0",
       "data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
       className,
@@ -72,7 +72,7 @@ const DrawerContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "bg-card border border-border shadow-2xl shadow-black/50",
+          "bg-card border border-border shadow-xl",
           "flex flex-col overflow-hidden",
 
           "duration-300",

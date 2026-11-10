@@ -6,7 +6,7 @@ import { Progress as ProgressPrimitive } from "radix-ui";
 import * as React from "react";
 
 const progressTrackVariants = cva(
-  "relative w-full overflow-hidden rounded-full bg-[#1C1C1C]",
+  "relative w-full overflow-hidden rounded-full bg-neutral-200",
   {
     variants: {
       size: {
@@ -24,15 +24,15 @@ const progressTrackVariants = cva(
 );
 
 const progressIndicatorVariants = cva(
-  "h-full w-full flex-1 transition-all duration-500 ease-out rounded-full",
+  "h-full w-full flex-1 transition-all duration-300 ease-out rounded-full",
   {
     variants: {
       colorScheme: {
-        brand: "bg-primary shadow-[0_0_8px_rgba(228,199,170,0.30)]",
-        success: "bg-[#A3E635] shadow-[0_0_8px_rgba(163,230,53,0.35)]",
-        danger: "bg-gradient-to-r from-red-500 to-orange-500",
-        warning: "bg-gradient-to-r from-amber-400 to-yellow-500",
-        neutral: "bg-gradient-to-r from-zinc-400 to-zinc-300",
+        brand: "bg-blue-600",
+        success: "bg-emerald-600",
+        danger: "bg-red-600",
+        warning: "bg-amber-500",
+        neutral: "bg-neutral-400",
       },
     },
     defaultVariants: {

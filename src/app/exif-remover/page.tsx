@@ -212,9 +212,9 @@ export default function ExifRemoverPage() {
         {files.length > 0 && (
           <div className="space-y-6 pt-4 border-t border-border">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-muted/40 border border-border">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <MapPinOff className="w-4 h-4 text-emerald-400" />
-                <span>GPS coordinates & camera serials will be permanently removed.</span>
+              <div className="flex items-center gap-2 text-xs text-neutral-600">
+                <MapPinOff className="w-4 h-4 text-emerald-600" />
+                <span>GPS coordinates &amp; camera serials will be permanently removed.</span>
               </div>
 
               <div className="flex items-center gap-3">

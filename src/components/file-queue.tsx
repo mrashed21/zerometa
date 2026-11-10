@@ -85,7 +85,7 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
       {/* ─── Progress Bar (Background) ─── */}
       {isProcessing && (
         <div 
-          className="absolute inset-y-0 left-0 bg-[rgba(0,200,255,0.05)] transition-all duration-300 ease-out z-0" 
+          className="absolute inset-y-0 left-0 bg-blue-50/80 transition-all duration-300 ease-out z-0" 
           style={{ width: `${file.progress}%` }} 
         />
       )}
@@ -177,7 +177,7 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
               </span>
             ) : isDone ? (
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-primary border-dashed bg-transparent border-primary/30">
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-emerald-700 border-dashed bg-emerald-50/50 border-emerald-300">
                   Metadata: Stripped
                 </Badge>
               </div>

@@ -67,7 +67,7 @@ export function ControlPanel({
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <Card
-        className="surface-glass overflow-hidden flex flex-col"
+        className="bg-white border border-neutral-200 rounded-xl shadow-xs overflow-hidden flex flex-col"
         style={{ maxHeight: "calc(100vh - 120px)" }}
       >
         <CardHeader className="pb-4 shrink-0">
@@ -146,7 +146,7 @@ export function ControlPanel({
                             className={`h-9 rounded-md border text-xs font-medium transition-all ${
                               options.globalResize.preset === value
                                 ? "border-primary bg-primary/15 text-primary"
-                                : "border-border bg-card/50 text-muted-foreground hover:border-zinc-600 hover:text-foreground"
+                                : "border-border bg-card/50 text-muted-foreground hover:border-neutral-300 hover:text-foreground"
                             }`}
                           >
                             {label}

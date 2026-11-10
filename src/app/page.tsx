@@ -210,52 +210,52 @@ export default function Home() {
   const queuedCount = files.filter((f) => f.status === "queued" || f.status === "error").length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Header />
 
       <main className="flex-1 pt-24 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
           {/* ─── 1. HERO SECTION ─── */}
           <section className="text-center pt-8 sm:pt-14 pb-4 space-y-6 max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
               <span>100% Client-Side Privacy Engine</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground font-sans leading-[1.08]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900 font-sans leading-[1.1]">
               Your Files. Your Privacy. <br className="hidden sm:inline" />
-              <span className="text-gradient-brand">Zero Metadata.</span>
+              <span className="text-blue-600">Zero Metadata.</span>
             </h1>
 
-            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed">
               Remove hidden metadata, GPS coordinates, device information, and unwanted digital footprints from your media files.
             </p>
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Button asChild size="lg" className="btn-primary h-12 px-8 text-sm font-semibold rounded-xl shadow-lg shadow-primary/20 w-full sm:w-auto">
+              <Button asChild size="lg" className="btn-primary h-11 px-7 text-sm font-semibold rounded-lg shadow-sm w-full sm:w-auto">
                 <a href="#uploader">
                   Clean My Files
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-8 text-sm font-medium rounded-xl border-border hover:bg-muted w-full sm:w-auto">
+              <Button asChild size="lg" variant="outline" className="h-11 px-7 text-sm font-medium rounded-lg border-neutral-300 hover:bg-neutral-50 w-full sm:w-auto">
                 <a href="#tools">Explore Tools</a>
               </Button>
             </div>
 
             {/* Security Indicators Bar */}
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4 text-xs text-neutral-600">
+              <span className="flex items-center gap-1.5 font-medium">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 No Cloud Uploads Required
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span className="flex items-center gap-1.5 font-medium">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 Zero Account Signup
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span className="flex items-center gap-1.5 font-medium">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 Verified Binary Stripping
               </span>
             </div>
@@ -263,11 +263,11 @@ export default function Home() {
 
           {/* ─── 2. MAIN FILE PROCESSOR DASHBOARD ─── */}
           <section id="uploader" className="space-y-6 scroll-mt-24">
-            <div className="bg-card/70 border border-border/80 rounded-3xl p-4 sm:p-8 shadow-xl backdrop-blur-sm space-y-6">
+            <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-8 shadow-xs space-y-6">
               {/* Format Filter Tabs */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200">
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
-                  <TabsList className="bg-muted/70 p-1 rounded-xl">
+                  <TabsList className="bg-neutral-100 p-1 rounded-lg">
                     <TabsTrigger value="all" className="text-xs px-3 py-1.5">All ({files.length})</TabsTrigger>
                     <TabsTrigger value="image" className="text-xs px-3 py-1.5 gap-1.5">
                       <ImageIcon className="w-3.5 h-3.5" /> Images
@@ -386,21 +386,21 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {TOOLS_LIST.map((tool) => (
                 <Link key={tool.href} href={tool.href} className="group block focus:outline-none">
-                  <Card className="surface-hover border-border h-full transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg">
+                  <Card className="bg-white border border-neutral-200 rounded-xl h-full transition-all duration-150 hover:border-neutral-300 hover:shadow-sm">
                     <CardContent className="p-6 space-y-4 flex flex-col justify-between h-full">
                       <div className="space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-sm">
-                          <tool.icon className="w-6 h-6" />
+                        <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors shadow-xs">
+                          <tool.icon className="w-5 h-5" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                        <h3 className="text-base font-bold text-neutral-900 group-hover:text-blue-600 transition-colors">
                           {tool.title}
                         </h3>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-xs text-neutral-600 leading-relaxed">
                           {tool.description}
                         </p>
                       </div>
 
-                      <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      <div className="pt-2 flex items-center gap-1.5 text-xs font-semibold text-blue-600">
                         <span>Launch Tool</span>
                         <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                       </div>
@@ -444,16 +444,16 @@ export default function Home() {
                   icon: Download,
                 },
               ].map((item, i) => (
-                <Card key={i} className="surface-hover border-border">
-                  <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary relative">
-                      <item.icon className="w-6 h-6" />
-                      <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-background border border-border flex items-center justify-center text-[10px] font-bold text-foreground">
+                <Card key={i} className="bg-white border border-neutral-200 rounded-xl shadow-xs">
+                  <CardContent className="p-6 flex flex-col items-center text-center space-y-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 relative">
+                      <item.icon className="w-5 h-5" />
+                      <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[10px] font-bold text-neutral-800">
                         {item.step}
                       </span>
                     </div>
-                    <h3 className="font-bold text-base text-foreground">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold text-sm text-neutral-900">{item.title}</h3>
+                    <p className="text-xs text-neutral-600 leading-relaxed">{item.desc}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -556,7 +556,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="surface-hover border-border">
                 <CardContent className="p-6 space-y-3">
-                  <Lock className="w-6 h-6 text-emerald-400" />
+                  <Lock className="w-6 h-6 text-emerald-600" />
                   <h3 className="font-bold text-base text-foreground">Client-Side by Default</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     In standard mode, all metadata inspection, stripping, and editing occurs directly inside your web browser using HTML5 Canvas and local WebAssembly. Your media files never leave your computer.
@@ -566,7 +566,7 @@ export default function Home() {
 
               <Card className="surface-hover border-border">
                 <CardContent className="p-6 space-y-3">
-                  <Server className="w-6 h-6 text-emerald-400" />
+                  <Server className="w-6 h-6 text-emerald-600" />
                   <h3 className="font-bold text-base text-foreground">Explicit Server Tasks</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Advanced server processing (e.g. sharp image optimizations) only occurs when you specifically select it. Files are processed in memory and never saved to persistent database storage or media caches.
@@ -576,7 +576,7 @@ export default function Home() {
 
               <Card className="surface-hover border-border">
                 <CardContent className="p-6 space-y-3">
-                  <Trash2 className="w-6 h-6 text-emerald-400" />
+                  <Trash2 className="w-6 h-6 text-emerald-600" />
                   <h3 className="font-bold text-base text-foreground">No Persistent Retention</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     We do not harvest metadata, track uploaded filenames, or store media files. Diagnostic metrics are strictly privacy-conscious and contain zero file content or sensitive EXIF tags.
@@ -638,19 +638,21 @@ export default function Home() {
           <FounderSection />
 
           {/* ─── 9. STRONG FINAL CTA ─── */}
-          <section className="p-8 sm:p-14 rounded-3xl bg-gradient-to-r from-card to-muted border border-border text-center space-y-6 shadow-xl">
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-sans">
+          <section className="p-8 sm:p-12 rounded-xl bg-neutral-50 border border-neutral-200 text-center space-y-4">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 font-sans">
               Take Control of Your Digital Privacy
             </h2>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm text-neutral-600 max-w-xl mx-auto leading-relaxed">
               Clean hidden camera tags, GPS coordinates, and personal device footprints from your files completely offline.
             </p>
-            <Button asChild size="lg" className="btn-primary h-12 px-8 text-sm font-semibold rounded-xl shadow-lg">
-              <a href="#uploader">
-                Start Cleaning Files Now
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
+            <div className="pt-2">
+              <Button asChild size="lg" className="btn-primary h-11 px-7 text-sm font-semibold rounded-lg shadow-sm">
+                <a href="#uploader">
+                  Start Cleaning Files Now
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </a>
+              </Button>
+            </div>
           </section>
         </div>
       </main>

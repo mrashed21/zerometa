@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { ToolShell } from "@/components/tool-shell";
-import { UniversalUploader } from "@/components/universal-uploader";
-import { extractUnifiedMetadata } from "@/lib/unified-processor";
-import { getMediaType } from "@/lib/media-types";
-import { generateId } from "@/lib/utils";
-import { downloadBlob } from "@/lib/download";
-import type { MediaFile } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SlidersHorizontal, Download, Save, RefreshCw, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { UniversalUploader } from "@/components/universal-uploader";
+import { downloadBlob } from "@/lib/download";
+import { getMediaType } from "@/lib/media-types";
+import type { MediaFile } from "@/lib/types";
+import { extractUnifiedMetadata } from "@/lib/unified-processor";
+import { generateId } from "@/lib/utils";
+import { RefreshCw, Save } from "lucide-react";
+import { useCallback, useState } from "react";
 
 export default function MetadataEditorPage() {
   const [files, setFiles] = useState<MediaFile[]>([]);
@@ -28,56 +28,78 @@ export default function MetadataEditorPage() {
 
   const { toast } = useToast();
 
-  const handleFilesAdded = useCallback(async (newFiles: File[]) => {
-    const mediaFiles = await Promise.all(
-      newFiles.map(async (file) => {
-        const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
-        const metadata = await extractUnifiedMetadata(file);
+  const handleFilesAdded = useCallback(
+    async (newFiles: File[]) => {
+      const mediaFiles = await Promise.all(
+        newFiles.map(async (file) => {
+          const preview = file.type.startsWith("image/")
+            ? URL.createObjectURL(file)
+            : null;
+          const metadata = await extractUnifiedMetadata(file);
 
-        return {
-          id: generateId(),
-          file,
-          mediaType: getMediaType(file) || ("image" as const),
-          preview,
-          status: "done" as const,
-          progress: 100,
-          result: null,
-          metadataBefore: metadata,
-        };
-      })
-    );
+          return {
+            id: generateId(),
+            file,
+            mediaType: getMediaType(file) || ("image" as const),
+            preview,
+            status: "done" as const,
+            progress: 100,
+            result: null,
+            metadataBefore: metadata,
+          };
+        }),
+      );
 
-    setFiles((prev) => {
-      const updated = [...prev, ...mediaFiles];
-      if (!activeFileId && updated.length > 0) {
-        setActiveFileId(updated[0].id);
-        // Pre-fill fields from original if found
-        const first = updated[0];
-        const existingAuthor = first.metadataBefore.find((f) => f.key.toLowerCase().includes("author") || f.key.toLowerCase().includes("artist"))?.value || "";
-        const existingTitle = first.metadataBefore.find((f) => f.key.toLowerCase().includes("title"))?.value || "";
-        const existingCopy = first.metadataBefore.find((f) => f.key.toLowerCase().includes("copyright"))?.value || "";
-        const existingDesc = first.metadataBefore.find((f) => f.key.toLowerCase().includes("description"))?.value || "";
+      setFiles((prev) => {
+        const updated = [...prev, ...mediaFiles];
+        if (!activeFileId && updated.length > 0) {
+          setActiveFileId(updated[0].id);
+          // Pre-fill fields from original if found
+          const first = updated[0];
+          const existingAuthor =
+            first.metadataBefore.find(
+              (f) =>
+                f.key.toLowerCase().includes("author") ||
+                f.key.toLowerCase().includes("artist"),
+            )?.value || "";
+          const existingTitle =
+            first.metadataBefore.find((f) =>
+              f.key.toLowerCase().includes("title"),
+            )?.value || "";
+          const existingCopy =
+            first.metadataBefore.find((f) =>
+              f.key.toLowerCase().includes("copyright"),
+            )?.value || "";
+          const existingDesc =
+            first.metadataBefore.find((f) =>
+              f.key.toLowerCase().includes("description"),
+            )?.value || "";
 
-        setAuthor(existingAuthor);
-        setTitle(existingTitle);
-        setCopyright(existingCopy);
-        setDescription(existingDesc);
-      }
-      return updated;
-    });
-  }, [activeFileId]);
+          setAuthor(existingAuthor);
+          setTitle(existingTitle);
+          setCopyright(existingCopy);
+          setDescription(existingDesc);
+        }
+        return updated;
+      });
+    },
+    [activeFileId],
+  );
 
   const activeFile = files.find((f) => f.id === activeFileId) || files[0];
 
-  const handleRemove = useCallback((id: string) => {
-    setFiles((prev) => {
-      const filtered = prev.filter((f) => f.id !== id);
-      if (activeFileId === id) {
-        setActiveFileId(filtered.length > 0 ? filtered[0].id : null);
-      }
-      return filtered;
-    });
-  }, [activeFileId]);
+  const handleRemove = useCallback(
+    (id: string) => {
+      setFiles((prev) => {
+        const filtered = prev.filter((f) => f.id !== id);
+        if (activeFileId === id) {
+          setActiveFileId(filtered.length > 0 ? filtered[0].id : null);
+        }
+        return filtered;
+      });
+    },
+    [activeFileId],
+  );
 
   const handleClearAll = useCallback(() => {
     setFiles([]);
@@ -95,6 +117,8 @@ export default function MetadataEditorPage() {
         formData.append("file", activeFile.file);
         formData.append("privacyMode", "clean-branding");
         formData.append("author", author);
+        formData.append("title", title);
+        formData.append("keywords", keywords);
         formData.append("copyright", copyright);
         formData.append("description", description);
         formData.append("software", "ZeroMeta Privacy Studio");
@@ -108,7 +132,10 @@ export default function MetadataEditorPage() {
 
         const blob = await resp.blob();
         const ext = activeFile.file.name.split(".").pop() || "jpg";
-        downloadBlob(blob, `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`);
+        downloadBlob(
+          blob,
+          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
+        );
 
         toast({
           title: "Metadata Updated",
@@ -119,7 +146,7 @@ export default function MetadataEditorPage() {
         // For documents/audio, download with sanitized copy
         downloadBlob(
           activeFile.file,
-          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${activeFile.file.name.split(".").pop()}`
+          `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${activeFile.file.name.split(".").pop()}`,
         );
         toast({
           title: "File Saved",
@@ -130,7 +157,8 @@ export default function MetadataEditorPage() {
     } catch (err) {
       toast({
         title: "Update Failed",
-        description: err instanceof Error ? err.message : "Failed to update metadata.",
+        description:
+          err instanceof Error ? err.message : "Failed to update metadata.",
         variant: "error",
       });
     } finally {
@@ -172,13 +200,15 @@ export default function MetadataEditorPage() {
           format: "PNG / WebP",
           extension: ".png, .webp",
           capabilities: "Standardized text chunks, XMP attribution",
-          notes: "Neutralizes GPS and device serials while attaching creator credit.",
+          notes:
+            "Neutralizes GPS and device serials while attaching creator credit.",
         },
         {
           format: "PDF Documents",
           extension: ".pdf",
           capabilities: "/Title, /Author, /Subject, /Keywords",
-          notes: "Updates document summary properties without modifying content.",
+          notes:
+            "Updates document summary properties without modifying content.",
         },
       ]}
       privacyNotes={[
@@ -230,18 +260,24 @@ export default function MetadataEditorPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-2xl bg-card border border-border">
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="author" className="text-xs font-semibold">Author / Creator Name</Label>
+                  <Label htmlFor="author" className="text-xs font-semibold">
+                    Author / Creator Name
+                  </Label>
                   <Input
                     id="author"
                     placeholder="e.g. Jane Doe"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                   />
-                  <p className="text-[11px] text-muted-foreground">Sets EXIF Artist / PDF Author.</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Sets EXIF Artist / PDF Author.
+                  </p>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="title" className="text-xs font-semibold">Work Title</Label>
+                  <Label htmlFor="title" className="text-xs font-semibold">
+                    Work Title
+                  </Label>
                   <Input
                     id="title"
                     placeholder="e.g. Sunset in Nature"
@@ -251,7 +287,9 @@ export default function MetadataEditorPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="copyright" className="text-xs font-semibold">Copyright Notice</Label>
+                  <Label htmlFor="copyright" className="text-xs font-semibold">
+                    Copyright Notice
+                  </Label>
                   <Input
                     id="copyright"
                     placeholder={`e.g. © ${new Date().getFullYear()} Jane Doe. All rights reserved.`}
@@ -263,7 +301,12 @@ export default function MetadataEditorPage() {
 
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-xs font-semibold">Image Description / Caption</Label>
+                  <Label
+                    htmlFor="description"
+                    className="text-xs font-semibold"
+                  >
+                    Image Description / Caption
+                  </Label>
                   <Input
                     id="description"
                     placeholder="e.g. Landscape photograph captured outdoors"
@@ -273,7 +316,9 @@ export default function MetadataEditorPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="keywords" className="text-xs font-semibold">Keywords / Tags (Comma separated)</Label>
+                  <Label htmlFor="keywords" className="text-xs font-semibold">
+                    Keywords / Tags (Comma separated)
+                  </Label>
                   <Input
                     id="keywords"
                     placeholder="e.g. photography, landscape, nature"
@@ -309,4 +354,3 @@ export default function MetadataEditorPage() {
     </ToolShell>
   );
 }
-

@@ -175,10 +175,10 @@ export default function GpsRemoverPage() {
     >
       <div className="space-y-6">
         {/* Pixel Disclaimer Alert */}
-        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-1 text-xs">
-            <span className="font-bold text-amber-300 uppercase tracking-wide">
+            <span className="font-bold text-amber-900 uppercase tracking-wide">
               Critical Privacy Disclosure
             </span>
             <p className="text-muted-foreground leading-relaxed">
@@ -204,15 +204,15 @@ export default function GpsRemoverPage() {
               <div className="flex items-center gap-2 text-xs">
                 {gpsFiles.length > 0 ? (
                   <>
-                    <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-                    <span className="text-rose-300 font-medium">
+                    <MapPin className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span className="text-rose-700 font-medium">
                       GPS coordinates detected in {gpsFiles.length} of {files.length} photos.
                     </span>
                   </>
                 ) : (
                   <>
-                    <MapPinOff className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="text-emerald-400 font-medium">
+                    <MapPinOff className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="text-emerald-700 font-medium">
                       No GPS coordinates found in queued files (or already stripped).
                     </span>
                   </>

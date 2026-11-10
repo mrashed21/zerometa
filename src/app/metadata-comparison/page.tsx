@@ -257,8 +257,8 @@ export default function MetadataComparisonPage() {
               {/* Removed / Stripped Fields */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-700">
                     Metadata Stripped ({strippedFields.length})
                   </h4>
                 </div>
@@ -267,16 +267,16 @@ export default function MetadataComparisonPage() {
                     strippedFields.map((field, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-xs"
+                        className="flex items-center justify-between p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs"
                       >
-                        <span className="font-medium text-foreground">{field.key}</span>
-                        <span className="font-mono text-muted-foreground line-through">
+                        <span className="font-medium text-neutral-900">{field.key}</span>
+                        <span className="font-mono text-neutral-500 line-through">
                           {field.value}
                         </span>
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 rounded-lg bg-muted/30 border border-border text-xs text-muted-foreground text-center">
+                    <div className="p-4 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-500 text-center">
                       No stripped fields recorded.
                     </div>
                   )}
@@ -286,8 +286,8 @@ export default function MetadataComparisonPage() {
               {/* Preserved / Retained Properties */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <FileCheck className="w-4 h-4 text-primary" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
+                  <FileCheck className="w-4 h-4 text-blue-600" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-blue-700">
                     Preserved Structure ({afterFields.length})
                   </h4>
                 </div>
@@ -295,10 +295,10 @@ export default function MetadataComparisonPage() {
                   {afterFields.map((field, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-2.5 rounded-lg bg-card border border-border text-xs"
+                      className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-neutral-200 text-xs shadow-xs"
                     >
-                      <span className="font-medium text-foreground">{field.key}</span>
-                      <span className="font-mono text-emerald-400">{field.value}</span>
+                      <span className="font-medium text-neutral-900">{field.key}</span>
+                      <span className="font-mono text-neutral-700">{field.value}</span>
                     </div>
                   ))}
                 </div>

@@ -1,16 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FounderSection } from "@/components/founder-section";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Lock, EyeOff, Server, CheckCircle2, Globe, Code2, ArrowRight } from "lucide-react";
+import { Shield, Lock, Eye, Compass, CheckCircle2, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About ZeroMeta & Founder Muhammad Rashed | Digital Privacy",
-  description: "Learn about ZeroMeta and founder Muhammad Rashed, Full Stack Developer building privacy-first digital media tools with zero cloud retention.",
+  description: "Learn about ZeroMeta and founder Muhammad Rashed, Full Stack Developer building practical software products and privacy-focused digital tools.",
   keywords: [
     "About ZeroMeta",
     "Muhammad Rashed",
@@ -19,7 +19,6 @@ export const metadata: Metadata = {
     "ZeroMeta Founder",
     "Full Stack Developer",
     "Software Developer",
-    "Rashed Jaman",
   ],
   alternates: {
     canonical: "/about",
@@ -32,75 +31,109 @@ export default function AboutPage() {
       <Header />
 
       <main className="flex-1 pt-24 pb-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           {/* Header */}
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <Badge className="badge-brand">Our Mission &amp; Story</Badge>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground font-sans">
-              About ZeroMeta &amp; Our Privacy Mission
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <Badge className="badge-brand">About</Badge>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-neutral-900 font-sans">
+              About ZeroMeta
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-              We believe privacy should be accessible, transparent, and built directly into digital tools by default.
+            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">
+              A privacy-focused digital media toolkit engineered for client-side security, metadata inspection, and clean media sharing.
             </p>
           </div>
 
-          {/* Mission & Background */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            <Card className="surface-hover border-border">
-              <CardContent className="p-6 sm:p-8 space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+          {/* Section 1: What ZeroMeta Does & Why It Was Built */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <Card className="bg-white border border-neutral-200 rounded-xl shadow-xs">
+              <CardContent className="p-6 sm:p-7 space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                   <Shield className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">Why ZeroMeta Was Created</h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Most online metadata removers require users to upload their private family photos, confidential work documents, or audio recordings to remote, unknown cloud servers. Often, these servers harvest EXIF tags, log IP addresses, or retain media indefinitely.
+                <h2 className="text-lg font-bold text-neutral-900">What ZeroMeta Does</h2>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  ZeroMeta allows individuals, creators, journalists, and privacy-conscious users to inspect, sanitize, compare, and redact hidden metadata from digital files—including photos, video footage, audio recordings, and PDF documents.
                 </p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  ZeroMeta was engineered to eliminate this risk entirely. By leveraging modern browser APIs, WebAssembly, and HTML5 Canvas, ZeroMeta inspects and cleans your files locally on your own computer or phone.
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  By purging digital headers such as EXIF GPS coordinates, camera serial numbers, and creator signatures, ZeroMeta ensures files can be published online without exposing personal digital footprints.
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="surface-hover border-border">
-              <CardContent className="p-6 sm:p-8 space-y-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <Lock className="w-5 h-5 text-emerald-400" />
+            <Card className="bg-white border border-neutral-200 rounded-xl shadow-xs">
+              <CardContent className="p-6 sm:p-7 space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Lock className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl font-bold text-foreground">Our Core Principles</h2>
-                <ul className="space-y-3 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span><strong>Local First:</strong> No files leave your device during standard processing.</span>
+                <h2 className="text-lg font-bold text-neutral-900">Why It Was Built</h2>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  The majority of free online file converters and metadata strippers require users to upload sensitive personal or business files to remote cloud servers. Those third-party servers can harvest EXIF tags, log IP addresses, and retain files indefinitely.
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  ZeroMeta was created to provide a dependable, transparent alternative where files are processed locally inside the user&apos;s browser using HTML5 Canvas, WebAssembly, and native binary parsers.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Section 2: Privacy-First Philosophy & Long-Term Vision */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <Card className="bg-white border border-neutral-200 rounded-xl shadow-xs">
+              <CardContent className="p-6 sm:p-7 space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <Eye className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-neutral-900">Privacy-First Philosophy</h2>
+                <ul className="space-y-2.5 text-xs text-neutral-600">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>Client-Side Execution:</strong> Default processing never transfers media bytes over the network.</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span><strong>Honesty in Security:</strong> We do not make exaggerated claims like removing invisible statistical AI watermarks.</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>No Surveillance:</strong> Zero tracking cookies, zero persistent databases, zero telemetry harvesting.</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span><strong>No Surveillance:</strong> Zero tracking cookies, zero account barriers, zero file logging.</span>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span><strong>Technical Honesty:</strong> Clear disclosures regarding what metadata tools can and cannot remove (such as landmark clues or invisible pixel watermarks).</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
+
+            <Card className="bg-white border border-neutral-200 rounded-xl shadow-xs">
+              <CardContent className="p-6 sm:p-7 space-y-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-bold text-neutral-900">Long-Term Vision</h2>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  Our objective is to continue developing ZeroMeta into an open, high-performance toolkit that empowers everyday internet users to safeguard their digital rights.
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed">
+                  Future plans include expanded client-side format parsers, advanced visual redaction techniques, and open-source verification benchmarks to maintain the highest security and transparency standards.
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Full Founder Section */}
+          {/* Section 3: Founder Profile */}
           <FounderSection />
 
-          {/* Back to Tools CTA */}
-          <div className="p-8 rounded-3xl bg-card border border-border text-center space-y-4">
-            <h3 className="text-xl font-bold text-foreground">Explore the ZeroMeta Privacy Studio</h3>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              Start cleaning your photos, videos, audio, and PDF documents today with verified client-side privacy.
+          {/* Bottom Action */}
+          <div className="p-6 sm:p-8 rounded-xl bg-neutral-50 border border-neutral-200 text-center space-y-3">
+            <h3 className="text-lg font-bold text-neutral-900">Experience ZeroMeta in Action</h3>
+            <p className="text-xs text-neutral-600 max-w-md mx-auto leading-relaxed">
+              Clean hidden camera tags, GPS coordinates, and personal device footprints from your media files completely offline.
             </p>
-            <Link
-              href="/#uploader"
-              className="btn-primary px-6 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center gap-2"
-            >
-              <span>Launch Studio</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="pt-2">
+              <Button asChild size="sm" className="btn-primary h-9 px-5 text-xs font-semibold">
+                <Link href="/#uploader">
+                  <span>Start Cleaning Files</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </main>
@@ -109,4 +142,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

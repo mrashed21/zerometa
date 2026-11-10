@@ -27,22 +27,22 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card border-border text-foreground",
+        default: "bg-white border-neutral-200 text-neutral-900 shadow-md",
         success: [
-          "bg-[oklch(0.62_0.17_162/0.12)] border-[oklch(0.62_0.17_162/0.3)]",
-          "text-foreground",
+          "bg-emerald-50 border-emerald-200",
+          "text-emerald-950 shadow-md",
         ],
         error: [
-          "bg-[oklch(0.45_0.20_25/0.12)] border-[oklch(0.45_0.20_25/0.3)]",
-          "text-foreground",
+          "bg-red-50 border-red-200",
+          "text-red-950 shadow-md",
         ],
         warning: [
-          "bg-[oklch(0.75_0.17_70/0.10)] border-[oklch(0.75_0.17_70/0.3)]",
-          "text-foreground",
+          "bg-amber-50 border-amber-200",
+          "text-amber-950 shadow-md",
         ],
         info: [
-          "bg-[oklch(0.55_0.27_293/0.10)] border-[oklch(0.55_0.27_293/0.3)]",
-          "text-foreground",
+          "bg-blue-50 border-blue-200",
+          "text-blue-950 shadow-md",
         ],
       },
     },
@@ -54,16 +54,16 @@ const toastVariants = cva(
 
 const iconMap: Record<string, React.ReactNode> = {
   success: (
-    <CheckCircle2 className="h-5 w-5 text-[oklch(0.72_0.17_162)] shrink-0 mt-0.5" />
+    <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
   ),
   error: (
-    <AlertCircle className="h-5 w-5 text-[oklch(0.70_0.20_25)] shrink-0 mt-0.5" />
+    <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
   ),
   warning: (
-    <AlertTriangle className="h-5 w-5 text-[oklch(0.80_0.15_70)] shrink-0 mt-0.5" />
+    <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
   ),
   info: (
-    <Info className="h-5 w-5 text-[oklch(0.75_0.18_293)] shrink-0 mt-0.5" />
+    <Info className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
   ),
 };
 

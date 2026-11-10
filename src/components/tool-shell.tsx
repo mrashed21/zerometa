@@ -82,29 +82,29 @@ export function ToolShell({
           </div>
 
           {/* Interactive Workspace Area */}
-          <div className="bg-card/50 border border-border/70 rounded-2xl p-4 sm:p-8 shadow-sm">
+          <div className="bg-white border border-neutral-200 rounded-xl p-4 sm:p-8 shadow-xs">
             {children}
           </div>
 
           {/* How It Works */}
-          <section className="space-y-6 pt-8 border-t border-border">
+          <section className="space-y-6 pt-8 border-t border-neutral-200">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
                 How It Works
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-neutral-600">
                 Execution is localized inside your browser engine to guarantee absolute privacy.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {howItWorks.map((item, i) => (
-                <Card key={i} className="surface-hover border-border">
+                <Card key={i} className="bg-white border border-neutral-200 rounded-xl shadow-xs">
                   <CardContent className="p-6 space-y-2">
-                    <span className="text-xs font-mono font-bold text-primary px-2 py-0.5 rounded bg-primary/10">
+                    <span className="text-xs font-mono font-bold text-blue-700 px-2 py-0.5 rounded bg-blue-50">
                       STEP {item.step}
                     </span>
-                    <h3 className="font-semibold text-foreground pt-1">{item.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <h3 className="font-semibold text-neutral-900 pt-1 text-sm">{item.title}</h3>
+                    <p className="text-xs text-neutral-600 leading-relaxed">
                       {item.desc}
                     </p>
                   </CardContent>
@@ -116,16 +116,16 @@ export function ToolShell({
           {/* Supported Formats */}
           <section className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Supported File Formats & Capabilities
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
+                Supported File Formats &amp; Capabilities
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-neutral-600">
                 ZeroMeta validates authentic file binary headers and signatures prior to processing.
               </p>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-border">
+            <div className="overflow-x-auto rounded-xl border border-neutral-200">
               <table className="w-full text-left text-xs">
-                <thead className="bg-muted/50 text-foreground font-semibold border-b border-border">
+                <thead className="bg-neutral-50 text-neutral-800 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="p-3">Format</th>
                     <th className="p-3">Extension</th>
@@ -133,13 +133,13 @@ export function ToolShell({
                     <th className="p-3">Technical Notes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-neutral-200 bg-white">
                   {supportedFormats.map((row, idx) => (
-                    <tr key={idx} className="hover:bg-muted/20 transition-colors">
-                      <td className="p-3 font-semibold text-foreground">{row.format}</td>
-                      <td className="p-3 font-mono text-muted-foreground">{row.extension}</td>
-                      <td className="p-3 text-muted-foreground">{row.capabilities}</td>
-                      <td className="p-3 text-muted-foreground">{row.notes}</td>
+                    <tr key={idx} className="hover:bg-neutral-50/60 transition-colors">
+                      <td className="p-3 font-semibold text-neutral-900">{row.format}</td>
+                      <td className="p-3 font-mono text-neutral-500">{row.extension}</td>
+                      <td className="p-3 text-neutral-600">{row.capabilities}</td>
+                      <td className="p-3 text-neutral-600">{row.notes}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -150,15 +150,15 @@ export function ToolShell({
           {/* Privacy & Limitations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Privacy Architecture */}
-            <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-4">
-              <div className="flex items-center gap-2 text-emerald-400">
-                <Shield className="w-5 h-5" />
+            <div className="p-6 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-4">
+              <div className="flex items-center gap-2 text-emerald-800">
+                <Shield className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm tracking-wide uppercase">Privacy Considerations</h3>
               </div>
-              <ul className="space-y-2 text-xs text-muted-foreground">
+              <ul className="space-y-2 text-xs text-neutral-700">
                 {privacyNotes.map((note, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <span>{note}</span>
                   </li>
                 ))}
@@ -166,15 +166,15 @@ export function ToolShell({
             </div>
 
             {/* Limitations & Disclaimers */}
-            <div className="p-6 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-4">
-              <div className="flex items-center gap-2 text-amber-400">
-                <AlertTriangle className="w-5 h-5" />
+            <div className="p-6 rounded-xl bg-amber-50/60 border border-amber-200 space-y-4">
+              <div className="flex items-center gap-2 text-amber-800">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
                 <h3 className="font-bold text-sm tracking-wide uppercase">Technical Boundaries</h3>
               </div>
-              <ul className="space-y-2 text-xs text-muted-foreground">
+              <ul className="space-y-2 text-xs text-neutral-700">
                 {limitations.map((lim, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="text-amber-400 font-bold shrink-0 mt-0.5">•</span>
+                    <span className="text-amber-600 font-bold shrink-0 mt-0.5">•</span>
                     <span>{lim}</span>
                   </li>
                 ))}
@@ -185,18 +185,18 @@ export function ToolShell({
           {/* Frequently Asked Questions */}
           <section className="space-y-6">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
                 Frequently Asked Questions
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="p-5 rounded-xl border border-border bg-card space-y-2">
-                  <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <HelpCircle className="w-4 h-4 text-primary shrink-0" />
+                <div key={i} className="p-5 rounded-xl border border-neutral-200 bg-white shadow-xs space-y-2">
+                  <h4 className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
+                    <HelpCircle className="w-4 h-4 text-blue-600 shrink-0" />
                     {faq.q}
                   </h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                  <p className="text-xs text-neutral-600 leading-relaxed pl-6">
                     {faq.a}
                   </p>
                 </div>

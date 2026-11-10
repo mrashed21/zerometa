@@ -32,11 +32,11 @@ const categoryIcons: Record<string, React.ReactNode> = {
 };
 
 const categoryColors: Record<string, string> = {
-  camera: "text-blue-400",
-  location: "text-red-400",
-  ai: "text-purple-400",
-  software: "text-amber-400",
-  other: "text-zinc-400",
+  camera: "text-blue-600",
+  location: "text-red-600",
+  ai: "text-purple-600",
+  software: "text-amber-600",
+  other: "text-neutral-500",
 };
 
 export function MetadataInspector({
@@ -120,8 +120,8 @@ export function MetadataInspector({
           {/* Before Column */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <ShieldAlert className="w-4 h-4 text-red-400" />
-              <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider">
+              <ShieldAlert className="w-4 h-4 text-red-600" />
+              <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider">
                 Before — Raw
               </h3>
             </div>
@@ -133,18 +133,18 @@ export function MetadataInspector({
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.03 }}
-                    className="flex items-start justify-between gap-2 p-2 rounded-lg bg-zinc-900/50 border border-zinc-800/50"
+                    className="flex items-start justify-between gap-2 p-2 rounded-lg bg-neutral-50 border border-neutral-200/80"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className={categoryColors[field.category] || "text-zinc-400"}>
+                      <span className={categoryColors[field.category] || "text-neutral-500"}>
                         {categoryIcons[field.category]}
                       </span>
-                      <span className="text-xs text-zinc-400 truncate">
+                      <span className="text-xs text-neutral-600 truncate">
                         {field.key}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-xs text-zinc-200 font-mono">
+                      <span className="text-xs text-neutral-900 font-mono">
                         {field.value}
                       </span>
                       <Badge
@@ -157,7 +157,7 @@ export function MetadataInspector({
                   </motion.div>
                 ))
               ) : (
-                <p className="text-sm text-zinc-500 text-center py-8">
+                <p className="text-sm text-neutral-500 text-center py-8">
                   No metadata detected
                 </p>
               )}
@@ -170,8 +170,8 @@ export function MetadataInspector({
           {/* After Column */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                 After — Cleaned
               </h3>
             </div>
@@ -183,18 +183,18 @@ export function MetadataInspector({
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.03 }}
-                    className="flex items-start justify-between gap-2 p-2 rounded-lg bg-zinc-900/50 border border-zinc-800/50"
+                    className="flex items-start justify-between gap-2 p-2 rounded-lg bg-neutral-50 border border-neutral-200/80"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className={categoryColors[field.category] || "text-zinc-400"}>
+                      <span className={categoryColors[field.category] || "text-neutral-500"}>
                         {categoryIcons[field.category]}
                       </span>
-                      <span className="text-xs text-zinc-400 truncate">
+                      <span className="text-xs text-neutral-600 truncate">
                         {field.key}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-xs text-zinc-200 font-mono">
+                      <span className="text-xs text-neutral-900 font-mono">
                         {field.value}
                       </span>
                       {field.stripped ? (
@@ -216,7 +216,7 @@ export function MetadataInspector({
                   </motion.div>
                 ))
               ) : (
-                <p className="text-sm text-zinc-500 text-center py-8">
+                <p className="text-sm text-neutral-500 text-center py-8">
                   Process image to see results
                 </p>
               )}

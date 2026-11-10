@@ -196,9 +196,9 @@ export default function VideoMetadataRemoverPage() {
         {files.length > 0 && (
           <div className="space-y-6 pt-4 border-t border-border">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-muted/40 border border-border">
-              <div className="text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">{files.length}</span> videos queued •{" "}
-                <span className="font-semibold text-emerald-400">{doneCount}</span> cleaned
+              <div className="text-xs text-neutral-600">
+                <span className="font-semibold text-neutral-900">{files.length}</span> videos queued •{" "}
+                <span className="font-semibold text-emerald-600">{doneCount}</span> cleaned
               </div>
 
               <div className="flex items-center gap-3">

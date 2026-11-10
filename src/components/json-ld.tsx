@@ -12,8 +12,7 @@ export function JsonLd() {
         sameAs: [
           "https://www.mrashed21.me/",
           "https://muhammadrashed.dev/",
-          "https://github.com/mrashed21",
-          "https://linkedin.com/in/mrashed21",
+          "https://muhammadrashed.tech/",
         ],
         knowsAbout: [
           "Full Stack Software Development",

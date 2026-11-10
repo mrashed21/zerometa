@@ -7,27 +7,27 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground shadow",
+        default: "border-transparent bg-primary text-primary-foreground shadow-xs",
         secondary: "border-border bg-muted text-muted-foreground",
-        outline: "border-border bg-transparent text-foreground/80",
+        outline: "border-border bg-background text-foreground/80",
 
         brand:
-          "border-[oklch(0.55_0.27_293/0.3)] bg-[oklch(0.55_0.27_293/0.12)] text-[oklch(0.75_0.18_293)]",
+          "border-blue-200 bg-blue-50 text-blue-700",
 
         purple:
-          "border-[oklch(0.55_0.27_293/0.3)] bg-[oklch(0.55_0.27_293/0.12)] text-[oklch(0.75_0.18_293)]",
+          "border-purple-200 bg-purple-50 text-purple-700",
 
         success:
-          "border-[oklch(0.62_0.17_162/0.3)] bg-[oklch(0.62_0.17_162/0.12)] text-[oklch(0.72_0.17_162)]",
+          "border-emerald-200 bg-emerald-50 text-emerald-700",
 
         warning:
-          "border-[oklch(0.75_0.17_70/0.3)] bg-[oklch(0.75_0.17_70/0.12)] text-[oklch(0.80_0.15_70)]",
+          "border-amber-200 bg-amber-50 text-amber-700",
 
         destructive:
-          "border-[oklch(0.45_0.20_25/0.3)] bg-[oklch(0.45_0.20_25/0.12)] text-[oklch(0.70_0.20_25)]",
+          "border-red-200 bg-red-50 text-red-700",
 
         processing:
-          "border-[oklch(0.55_0.27_293/0.3)] bg-[oklch(0.55_0.27_293/0.12)] text-[oklch(0.75_0.18_293)] animate-pulse",
+          "border-blue-200 bg-blue-50 text-blue-700 animate-pulse",
       },
 
       size: {

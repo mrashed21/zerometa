@@ -398,14 +398,14 @@ export default function ImagePrivacyToolsPage() {
             </div>
 
             {/* Canvas Workspace */}
-            <div className="relative border border-border rounded-xl bg-black/40 overflow-hidden flex items-center justify-center p-2 min-h-[400px]">
+            <div className="relative border border-neutral-200 rounded-xl bg-neutral-100 overflow-hidden flex items-center justify-center p-3 min-h-[400px]">
               <canvas
                 ref={canvasRef}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
-                className="max-w-full max-h-[70vh] object-contain cursor-crosshair shadow-2xl rounded touch-none"
+                className="max-w-full max-h-[70vh] object-contain cursor-crosshair shadow-md rounded border border-neutral-300 touch-none bg-white"
               />
             </div>
           </div>

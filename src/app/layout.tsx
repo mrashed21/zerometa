@@ -2,15 +2,15 @@ import { JsonLd } from "@/components/json-ld";
 import { ToastContextProvider } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
 // ─── Fonts
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-poppins",
+  variable: "--font-inter",
   weight: ["400", "500", "600", "700"],
 });
 
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#09090b",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -101,11 +101,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("dark", poppins.variable)}>
+    <html lang="en" className={cn("light", inter.variable)}>
       <body
         className={cn(
-          "app-background text-foreground antialiased selection:bg-primary/30",
-          poppins.className,
+          "app-background text-foreground antialiased selection:bg-blue-100 selection:text-blue-900",
+          inter.className,
         )}
       >
         <JsonLd />
