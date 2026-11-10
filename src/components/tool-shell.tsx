@@ -27,7 +27,7 @@ export interface ToolShellProps {
 
 export function ToolShell({
   title,
-  badge = "100% Client-Side",
+  badge = "Privacy-First Processing",
   description,
   breadcrumbs,
   children,
@@ -70,7 +70,7 @@ export function ToolShell({
                 {badge}
               </Badge>
               <Badge variant="outline" className="text-xs text-muted-foreground border-border/80">
-                Zero Cloud Storage
+                No Persistent File Storage
               </Badge>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground font-sans">
@@ -93,7 +93,7 @@ export function ToolShell({
                 How It Works
               </h2>
               <p className="text-sm text-neutral-600">
-                Execution is localized inside your browser engine to guarantee absolute privacy.
+                Processing location depends on the selected tool and mode. Browser-based tools process files locally; advanced image processing may send the selected file to the ZeroMeta processing endpoint. Files are not intended to be stored permanently.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
