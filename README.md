@@ -25,13 +25,13 @@ Every digital photo, recorded audio note, and exported document carries invisibl
 
 When files are shared online via messaging platforms, public marketplaces, or cloud storage, this invisible metadata can expose sensitive personal routines, residential locations, and physical hardware identities.
 
-**ZeroMeta** is an all-in-one privacy toolkit engineered to inspect, neutralize, and strip this sensitive metadata. Designed from the ground up to protect user privacy, ZeroMeta performs image sanitization and binary metadata stripping **directly inside your web browser**. Your sensitive files are not uploaded to remote servers or stored in remote databases.
+**ZeroMeta** is an all-in-one privacy toolkit engineered to inspect, neutralize, and strip this sensitive metadata. Processing location depends on the selected tool and mode: browser-based image and media workflows run locally, while Advanced image processing uploads the selected image to the application's processing endpoint. The application is designed not to retain uploaded files in persistent storage; review the privacy policy for current data-handling details.
 
 ---
 
 ## ✨ Key Features
 
-- **100% Client-Side Processing**: Default image sanitization and EXIF stripping execute entirely in your browser using HTML5 Canvas, WebAssembly, and local binary parsers.
+- **Multiple Processing Modes**: Fast image sanitization and supported FFmpeg media workflows run in the browser. Advanced image processing uses the application's server-side Sharp endpoint, so the selected image is transmitted to that endpoint for processing.
 - **Deep Metadata Inspection**: View complete EXIF, XMP, IPTC, GPS coordinates, device models, and maker notes before choosing to scrub.
 - **Multi-Format Support**: Comprehensive tools for Images (`JPEG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG`), Documents (`PDF`), Video (`MP4`, `MOV`, `WebM`), and Audio (`MP3`, `WAV`, `OGG`, `M4A`).
 - **Interactive Before/After Comparison**: Side-by-side visual difference slider and metadata comparison table verifying header removal.
