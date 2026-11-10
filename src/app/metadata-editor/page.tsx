@@ -147,7 +147,7 @@ export default function MetadataEditorPage() {
       const ext = outputFormat === "jpeg" ? "jpg" : outputFormat;
       downloadBlob(
         blob,
-        `${activeFile.file.name.replace(/\\.[^.]+$/, "")}_edited.${ext}`,
+        `${activeFile.file.name.replace(/\.[^.]+$/, "")}_edited.${ext}`,
       );
 
       toast({
