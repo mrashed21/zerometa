@@ -122,7 +122,10 @@ export default function MetadataEditorPage() {
         // Send to server-side sharp with clean-branding and custom fields
         const formData = new FormData();
         formData.append("file", activeFile.file);
-        formData.append("privacyMode", "clean-branding");\n        const inputExtension = activeFile.file.name.split(".").pop()?.toLowerCase() || "";\n        const outputFormat = ["png", "webp"].includes(inputExtension) ? inputExtension : "jpeg";\n        formData.append("format", outputFormat);
+        formData.append("privacyMode", "clean-branding");
+        const inputExtension = activeFile.file.name.split(".").pop()?.toLowerCase() || "";
+        const outputFormat = ["png", "webp"].includes(inputExtension) ? inputExtension : "jpeg";
+        formData.append("format", outputFormat);
         formData.append("author", author);
         formData.append("title", title);
         formData.append("keywords", keywords);
