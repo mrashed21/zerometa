@@ -14,7 +14,7 @@ test("image signature detection rejects MIME spoofing", () => {
     detectImageMime(Buffer.from("RIFF0000WEBP", "ascii")),
     "image/webp",
   );
-  assert.equal(detectImageMime(Buffer.from([0x49, 0x49, 0x2a, 0x00])), "image/tiff");
+  assert.equal(detectImageMime(Buffer.from([0x49, 0x49, 0x2a, 0x00])), "image/tiff");\n  assert.equal(detectImageMime(Buffer.from("GIF89a", "ascii")), "image/gif");
   assert.equal(detectImageMime(Buffer.from("not an image")), null);
 });
 
