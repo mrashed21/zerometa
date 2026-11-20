@@ -49,8 +49,8 @@ When files are shared online via messaging platforms, public marketplaces, or cl
 | :--- | :--- | :--- | :--- |
 | **Images** | `JPEG`, `JPG`, `PNG`, `WebP`, `GIF`, `TIFF`, `SVG` | HTML5 Canvas / Sharp | Metadata stripping, selected EXIF writing, visual metadata inspection, pixel redaction |
 | **Documents** | `PDF` | `pdf-lib` parser and rewrite | Removes standard document Info fields and the catalog-level XMP reference; other PDF metadata structures are outside the verified scope |
-| **Video** | `MP4`, `MOV`, `WebM`, `MKV` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
-| **Audio** | `MP3`, `WAV`, `OGG`, `M4A`, `AAC`, `FLAC` | Client-side FFmpeg WASM | Disables global/stream metadata mapping and chapter mapping; attached artwork and container-specific tags are not independently verified |
+| **Video** | `MP4`, `MOV`, `WebM`, `MKV` | In-memory binary atom sanitizer / FFmpeg WASM | Neutralizes `udta`/`uuid` metadata boxes, zeroes timeline creation timestamps, lossless stream copy |
+| **Audio** | `MP3`, `WAV`, `OGG`, `M4A`, `AAC`, `FLAC` | In-memory ID3 & RIFF binary cleaner / FFmpeg WASM | Strips ID3v2, ID3v1, RIFF `LIST` metadata chunks without audio transcoding loss |
 
 ---
 
