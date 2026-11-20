@@ -262,6 +262,44 @@ async function extractVideoMetadata(file: File): Promise<MetadataField[]> {
     { key: "Last Modified", value: new Date(file.lastModified).toLocaleString(), category: "other", stripped: false },
   ];
 
+  // Inspect MP4 / QuickTime atom markers
+  try {
+    const sliceBytes = await file.slice(0, Math.min(file.size, 512 * 1024)).arrayBuffer();
+    const uint8 = new Uint8Array(sliceBytes);
+
+    // Scan for udta / GPS / Camera atoms
+    let hasUdta = false;
+    let hasUuid = false;
+    for (let i = 0; i < uint8.length - 8; i++) {
+      if (uint8[i] === 0x75 && uint8[i + 1] === 0x64 && uint8[i + 2] === 0x74 && uint8[i + 3] === 0x61) {
+        hasUdta = true; // 'udta'
+      }
+      if (uint8[i] === 0x75 && uint8[i + 1] === 0x75 && uint8[i + 2] === 0x69 && uint8[i + 3] === 0x64) {
+        hasUuid = true; // 'uuid'
+      }
+    }
+
+    if (hasUdta) {
+      fields.push({
+        key: "User Data (udta)",
+        value: "Detected (Camera tags, GPS or device metadata present)",
+        category: "location",
+        stripped: false,
+      });
+    }
+
+    if (hasUuid) {
+      fields.push({
+        key: "Vendor UUID Telemetry",
+        value: "Detected (Proprietary drone/camera metadata box)",
+        category: "camera",
+        stripped: false,
+      });
+    }
+  } catch {
+    // Non-blocking binary inspection
+  }
+
   if (typeof window !== "undefined") {
     try {
       const url = URL.createObjectURL(file);
@@ -309,6 +347,22 @@ async function extractAudioMetadata(file: File): Promise<MetadataField[]> {
     { key: "Audio Format", value: file.type || "Audio Stream", category: "other", stripped: false },
     { key: "Last Modified", value: new Date(file.lastModified).toLocaleString(), category: "other", stripped: false },
   ];
+
+  // Inspect ID3v2 at start of MP3
+  try {
+    const headBytes = await file.slice(0, 10).arrayBuffer();
+    const u8 = new Uint8Array(headBytes);
+    if (u8.length >= 3 && u8[0] === 0x49 && u8[1] === 0x44 && u8[2] === 0x33) {
+      fields.push({
+        key: "ID3v2 Header",
+        value: `Version 2.${u8[3]}.${u8[4]} detected (Embedded artist/track tags)`,
+        category: "camera",
+        stripped: false,
+      });
+    }
+  } catch {
+    // Non-blocking inspection
+  }
 
   if (typeof window !== "undefined") {
     try {
