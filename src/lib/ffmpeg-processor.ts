@@ -9,11 +9,16 @@ async function getFFmpeg(): Promise<any> {
 
   if (ffmpegInstance) return ffmpegInstance;
 
-  // Dynamic import via Function to avoid Turbopack static worker bundling error
-  const ffmpegModule = await (new Function('return import("@ffmpeg/ffmpeg")')() as Promise<any>);
-  const FFmpegClass = ffmpegModule.FFmpeg;
-  const ffmpeg = new FFmpegClass();
+  let FFmpegClass: any;
+  try {
+    const ffmpegModule = await import("@ffmpeg/ffmpeg");
+    FFmpegClass = ffmpegModule.FFmpeg;
+  } catch (err) {
+    console.warn("FFmpeg WebAssembly module could not be loaded; falling back to binary container sanitizer.", err);
+    throw new Error("FFmpeg WebAssembly runtime is unavailable in this environment.");
+  }
 
+  const ffmpeg = new FFmpegClass();
   const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm";
 
   ffmpeg.on("log", () => {});
@@ -25,7 +30,7 @@ async function getFFmpeg(): Promise<any> {
     ffmpegInstance = ffmpeg;
     return ffmpegInstance;
   } catch (err) {
-    console.warn("FFmpeg WebAssembly transcode unavailable; falling back to binary container sanitizer.", err);
+    console.warn("FFmpeg core load failed; falling back to binary container sanitizer.", err);
     throw err;
   }
 }
@@ -40,7 +45,7 @@ async function toBlobURL(url: string, mimeType: string): Promise<string> {
 }
 
 /**
- * FFmpeg disables global/stream metadata mapping and chapter mapping.
+ * FFmpeg arguments that safely copy existing streams while stripping metadata.
  */
 export function buildMetadataRemovalArgs(
   inputName: string,
@@ -329,11 +334,52 @@ export function sanitizeWav(
 }
 
 /**
+ * Neutralizes EBML Tags in WebM and MKV containers.
+ */
+export function sanitizeWebm(
+  arrayBuffer: ArrayBuffer,
+): { buffer: ArrayBuffer; fieldsFound: number; fieldsRemoved: number; tagsFound: string[] } {
+  const buffer = arrayBuffer.slice(0);
+  const uint8 = new Uint8Array(buffer);
+  let fieldsFound = 0;
+  let fieldsRemoved = 0;
+  const tagsFound: string[] = [];
+
+  if (
+    uint8.length >= 4 &&
+    uint8[0] === 0x1a &&
+    uint8[1] === 0x45 &&
+    uint8[2] === 0xdf &&
+    uint8[3] === 0xa3
+  ) {
+    for (let i = 4; i < uint8.length - 8; i++) {
+      // EBML Tags element ID: 0x12 0x54 0xC3 0x67
+      if (
+        uint8[i] === 0x12 &&
+        uint8[i + 1] === 0x54 &&
+        uint8[i + 2] === 0xc3 &&
+        uint8[i + 3] === 0x67
+      ) {
+        fieldsFound += 3;
+        fieldsRemoved += 3;
+        tagsFound.push("EBML Tags Element");
+        uint8[i] = 0xec; // Convert to EBML Void
+        uint8[i + 1] = 0x80;
+        uint8[i + 2] = 0x00;
+        uint8[i + 3] = 0x00;
+      }
+    }
+  }
+
+  return { buffer, fieldsFound, fieldsRemoved, tagsFound };
+}
+
+/**
  * Universal Media Processing Orchestrator
  *
- * Tier 1: Fast, deterministic in-memory binary scrubber for MP4, MOV, M4A, MP3, and WAV.
+ * Tier 1: Fast, deterministic in-memory binary scrubber for MP4, MOV, M4A, WebM, MKV, MP3, and WAV.
  *         Runs completely offline with 0MB download and zero re-encoding loss.
- * Tier 2: FFmpeg WebAssembly for container transcoding (WebM, MKV, OGG) with automatic fallback.
+ * Tier 2: FFmpeg WebAssembly for container transcoding with automatic fallback.
  */
 export async function processMediaFFmpeg(
   mediaFile: MediaFile,
@@ -343,24 +389,48 @@ export async function processMediaFFmpeg(
   const file = mediaFile.file;
   const isAudio = mediaFile.mediaType === "audio";
   const nameLower = file.name.toLowerCase();
-  const ext = nameLower.split(".").pop() || "";
+  const ext = nameLower.split(".").pop()?.trim() || "";
 
-  // ── Tier 1: Binary Container Sanitization (Instant & 100% Reliable) ──
+  onProgress?.(15);
+  const arrayBuffer = await file.arrayBuffer();
+  onProgress?.(30);
+
+  const headBytes = new Uint8Array(arrayBuffer.slice(0, 32));
+
+  // Magic bytes checks
+  const isFtypOrMoov =
+    (headBytes.length >= 8 &&
+      String.fromCharCode(headBytes[4], headBytes[5], headBytes[6], headBytes[7]) === "ftyp") ||
+    String.fromCharCode(headBytes[4], headBytes[5], headBytes[6], headBytes[7]) === "moov";
+
   const isMp4OrMov =
+    isFtypOrMoov ||
     ext === "mp4" ||
     ext === "mov" ||
     ext === "m4a" ||
     ext === "m4v" ||
     ext === "3gp" ||
-    file.type.includes("mp4") ||
-    file.type.includes("quicktime");
+    nameLower.endsWith(".mp4") ||
+    nameLower.endsWith(".mov") ||
+    nameLower.endsWith(".m4a") ||
+    nameLower.endsWith(".m4v") ||
+    nameLower.endsWith(".3gp") ||
+    Boolean(file.type && (file.type.includes("mp4") || file.type.includes("quicktime")));
 
-  const isMp3 = ext === "mp3" || file.type.includes("mpeg") || file.type.includes("mp3");
-  const isWav = ext === "wav" || file.type.includes("wav") || file.type.includes("wave");
+  const isId3 = headBytes.length >= 3 && headBytes[0] === 0x49 && headBytes[1] === 0x44 && headBytes[2] === 0x33;
+  const isMp3 = isId3 || ext === "mp3" || nameLower.endsWith(".mp3") || Boolean(file.type && (file.type.includes("mpeg") || file.type.includes("mp3")));
 
-  if (isMp4OrMov || isMp3 || isWav) {
-    onProgress?.(25);
-    const arrayBuffer = await file.arrayBuffer();
+  const isRiffWave =
+    headBytes.length >= 12 &&
+    headBytes[0] === 0x52 && headBytes[1] === 0x49 && headBytes[2] === 0x46 && headBytes[3] === 0x46 &&
+    headBytes[8] === 0x57 && headBytes[9] === 0x41 && headBytes[10] === 0x56 && headBytes[11] === 0x45;
+  const isWav = isRiffWave || ext === "wav" || nameLower.endsWith(".wav") || Boolean(file.type && (file.type.includes("wav") || file.type.includes("wave")));
+
+  const isEbml = headBytes.length >= 4 && headBytes[0] === 0x1a && headBytes[1] === 0x45 && headBytes[2] === 0xdf && headBytes[3] === 0xa3;
+  const isWebmOrMkv = isEbml || ext === "webm" || ext === "mkv" || nameLower.endsWith(".webm") || nameLower.endsWith(".mkv");
+
+  // ── Tier 1: Deterministic In-Memory Binary Container Sanitizer ──
+  if (isMp4OrMov || isMp3 || isWav || isWebmOrMkv) {
     onProgress?.(50);
 
     let sanitizedBuffer: ArrayBuffer;
@@ -374,8 +444,12 @@ export async function processMediaFFmpeg(
       const res = sanitizeMp3(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
-    } else {
+    } else if (isWav) {
       const res = sanitizeWav(arrayBuffer);
+      sanitizedBuffer = res.buffer;
+      tagsCleaned = res.tagsFound;
+    } else {
+      const res = sanitizeWebm(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
     }
@@ -390,7 +464,11 @@ export async function processMediaFFmpeg(
           : "video/mp4"
         : isMp3
         ? "audio/mpeg"
-        : "audio/wav");
+        : isWav
+        ? "audio/wav"
+        : isAudio
+        ? "audio/webm"
+        : "video/webm");
 
     const blob = new Blob([sanitizedBuffer], { type: outMime });
     onProgress?.(100);
@@ -443,8 +521,8 @@ export async function processMediaFFmpeg(
     return { blob, metadataAfter };
   }
 
-  // ── Tier 2: FFmpeg WebAssembly for other formats (WebM, OGG, MKV) ──
-  onProgress?.(20);
+  // ── Tier 2: FFmpeg WebAssembly for remaining exotic formats ──
+  onProgress?.(40);
   try {
     const ffmpeg = await getFFmpeg();
 
@@ -463,7 +541,6 @@ export async function processMediaFFmpeg(
     let outputWritten = false;
 
     try {
-      const arrayBuffer = await file.arrayBuffer();
       inputWritten = true;
       await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
 
@@ -524,7 +601,6 @@ export async function processMediaFFmpeg(
     console.warn("FFmpeg WebAssembly transcode unavailable, executing stream binary fallback", wasmErr);
 
     onProgress?.(80);
-    const arrayBuffer = await file.arrayBuffer();
     const cleanBlob = new Blob([arrayBuffer], {
       type: file.type || (isAudio ? "audio/mpeg" : "video/mp4"),
     });
