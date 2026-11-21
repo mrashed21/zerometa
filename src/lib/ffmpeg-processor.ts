@@ -11,8 +11,15 @@ async function getFFmpeg(): Promise<any> {
 
   let FFmpegClass: any;
   try {
-    const ffmpegModule = await import("@ffmpeg/ffmpeg");
-    FFmpegClass = ffmpegModule.FFmpeg;
+    // Dynamic import of ESM via CDN in browser to prevent Turbopack bundle failure
+    // and avoid bare module specifier resolution errors
+    const cdnUrl = "https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js";
+    const importFn = new Function("url", "return import(url)");
+    const ffmpegModule = await importFn(cdnUrl);
+    FFmpegClass = ffmpegModule?.FFmpeg;
+    if (!FFmpegClass) {
+      throw new Error("FFmpeg class not found in loaded module.");
+    }
   } catch (err) {
     console.warn("FFmpeg WebAssembly module could not be loaded; falling back to binary container sanitizer.", err);
     throw new Error("FFmpeg WebAssembly runtime is unavailable in this environment.");
