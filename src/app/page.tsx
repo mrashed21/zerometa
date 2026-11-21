@@ -66,6 +66,33 @@ export default function Home() {
   const abortRef = useRef<AbortController | null>(null);
 
   const handleFilesAdded = useCallback(async (newFiles: File[]) => {
+    // Auto Tab Switch: If a video or PDF (or audio/image) is uploaded, automatically switch to its dedicated tab
+    const hasVideo = newFiles.some((f) =>
+      f.type.startsWith("video/") ||
+      [".mp4", ".mov", ".m4a", ".m4v", ".3gp", ".webm", ".mkv"].some((ext) => f.name.toLowerCase().endsWith(ext))
+    );
+    const hasPdf = newFiles.some((f) =>
+      f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")
+    );
+    const hasAudio = newFiles.some((f) =>
+      f.type.startsWith("audio/") ||
+      [".mp3", ".wav", ".ogg", ".m4a", ".flac"].some((ext) => f.name.toLowerCase().endsWith(ext))
+    );
+    const hasImage = newFiles.some((f) =>
+      f.type.startsWith("image/") ||
+      [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".tiff"].some((ext) => f.name.toLowerCase().endsWith(ext))
+    );
+
+    if (hasVideo) {
+      setActiveTab("video");
+    } else if (hasPdf) {
+      setActiveTab("document");
+    } else if (hasAudio) {
+      setActiveTab("audio");
+    } else if (hasImage) {
+      setActiveTab("image");
+    }
+
     const mediaFiles = await Promise.all(
       newFiles.map(async (file) => {
         const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
@@ -107,6 +134,7 @@ export default function Home() {
       if (f.preview) URL.revokeObjectURL(f.preview);
     });
     setFiles([]);
+    setActiveTab("all");
   }, [files]);
 
   const handleInspect = useCallback((id: string) => {
@@ -268,18 +296,20 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200">
                 <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full sm:w-auto">
                   <TabsList className="bg-neutral-100 p-1 rounded-lg">
-                    <TabsTrigger value="all" className="text-xs px-3 py-1.5">All ({files.length})</TabsTrigger>
+                    <TabsTrigger value="all" className="text-xs px-3 py-1.5">
+                      All ({files.length})
+                    </TabsTrigger>
                     <TabsTrigger value="image" className="text-xs px-3 py-1.5 gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5" /> Images
+                      <ImageIcon className="w-3.5 h-3.5" /> Images ({files.filter((f) => f.mediaType === "image").length})
                     </TabsTrigger>
                     <TabsTrigger value="video" className="text-xs px-3 py-1.5 gap-1.5">
-                      <Video className="w-3.5 h-3.5" /> Videos
+                      <Video className="w-3.5 h-3.5" /> Videos ({files.filter((f) => f.mediaType === "video").length})
                     </TabsTrigger>
                     <TabsTrigger value="audio" className="text-xs px-3 py-1.5 gap-1.5">
-                      <Music className="w-3.5 h-3.5" /> Audio
+                      <Music className="w-3.5 h-3.5" /> Audio ({files.filter((f) => f.mediaType === "audio").length})
                     </TabsTrigger>
                     <TabsTrigger value="document" className="text-xs px-3 py-1.5 gap-1.5">
-                      <FileText className="w-3.5 h-3.5" /> PDFs
+                      <FileText className="w-3.5 h-3.5" /> PDFs ({files.filter((f) => f.mediaType === "document").length})
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -362,7 +392,7 @@ export default function Home() {
                       onProcess={handleProcessAll}
                       onCancel={() => abortRef.current?.abort()}
                       isProcessing={isProcessing}
-                      activeTab={activeTab === "all" || activeTab === "document" ? "image" : activeTab}
+                      activeTab={activeTab}
                       fileCount={files.length}
                     />
                   </div>

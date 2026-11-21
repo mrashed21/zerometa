@@ -85,7 +85,7 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
       {/* ─── Progress Bar (Background) ─── */}
       {isProcessing && (
         <div 
-          className="absolute inset-y-0 left-0 bg-blue-50/80 transition-all duration-300 ease-out z-0" 
+          className="absolute inset-y-0 left-0 bg-blue-500/10 transition-all duration-200 ease-out z-0 pointer-events-none" 
           style={{ width: `${file.progress}%` }} 
         />
       )}
@@ -163,14 +163,26 @@ function FileCard({ file, onRemove, onInspect, onDownload }: FileCardProps) {
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-1">
-          <div className="flex items-center gap-2 w-full max-w-xs">
+          <div className="flex items-center gap-2 w-full max-w-sm">
             {isProcessing ? (
-              <>
-                <Progress value={file.progress} className="h-1.5 flex-1" />
-                <span className="text-xs text-muted-foreground tabular-nums w-8">
-                  {Math.round(file.progress)}%
-                </span>
-              </>
+              <div className="w-full space-y-1">
+                <div className="flex items-center gap-2">
+                  <Progress value={file.progress} className="h-1.5 flex-1" />
+                  <span className="text-xs text-muted-foreground tabular-nums w-10 text-right font-medium">
+                    {Math.round(file.progress)}%
+                  </span>
+                </div>
+                <p className="text-[11px] text-blue-600 font-medium animate-pulse flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+                  <span>
+                    {file.progress <= 52
+                      ? `Loading ${file.mediaType === "video" ? "video" : "file"} into browser memory (${Math.round(file.progress)}%)...`
+                      : file.progress < 85
+                      ? "Sanitizing metadata & container atoms..."
+                      : "Finalizing clean file..."}
+                  </span>
+                </p>
+              </div>
             ) : isError ? (
               <span className="text-xs text-destructive flex items-center gap-1" role="alert" aria-live="assertive">
                 {file.error || "Processing failed"}

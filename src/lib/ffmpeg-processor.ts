@@ -382,6 +382,50 @@ export function sanitizeWebm(
 }
 
 /**
+ * Reads a File into ArrayBuffer with granular progress callbacks.
+ * In the browser, FileReader.onprogress emits continuous progress events
+ * as large media (video/audio) files are loaded from disk into memory.
+ */
+function readFileArrayBufferWithProgress(
+  file: File,
+  onProgress?: (progress: number) => void,
+): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    onProgress?.(5);
+
+    if (typeof FileReader === "undefined") {
+      file.arrayBuffer().then((buffer) => {
+        onProgress?.(50);
+        resolve(buffer);
+      }, reject);
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) {
+        // Map disk-to-browser RAM loading from 5% to 50%
+        const loadedRatio = event.loaded / event.total;
+        const progressPct = Math.min(50, Math.max(5, Math.round(5 + loadedRatio * 45)));
+        onProgress?.(progressPct);
+      }
+    };
+
+    reader.onload = () => {
+      onProgress?.(52);
+      resolve(reader.result as ArrayBuffer);
+    };
+
+    reader.onerror = () => {
+      reject(reader.error || new Error("Failed to read media file into browser memory"));
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/**
  * Universal Media Processing Orchestrator
  *
  * Tier 1: Fast, deterministic in-memory binary scrubber for MP4, MOV, M4A, WebM, MKV, MP3, and WAV.
@@ -398,9 +442,9 @@ export async function processMediaFFmpeg(
   const nameLower = file.name.toLowerCase();
   const ext = nameLower.split(".").pop()?.trim() || "";
 
-  onProgress?.(15);
-  const arrayBuffer = await file.arrayBuffer();
-  onProgress?.(30);
+  onProgress?.(5);
+  const arrayBuffer = await readFileArrayBufferWithProgress(file, onProgress);
+  onProgress?.(55);
 
   const headBytes = new Uint8Array(arrayBuffer.slice(0, 32));
 
@@ -438,30 +482,34 @@ export async function processMediaFFmpeg(
 
   // ── Tier 1: Deterministic In-Memory Binary Container Sanitizer ──
   if (isMp4OrMov || isMp3 || isWav || isWebmOrMkv) {
-    onProgress?.(50);
+    onProgress?.(65);
 
     let sanitizedBuffer: ArrayBuffer;
     let tagsCleaned: string[] = [];
 
     if (isMp4OrMov) {
+      onProgress?.(72);
       const res = sanitizeMp4Mov(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
     } else if (isMp3) {
+      onProgress?.(72);
       const res = sanitizeMp3(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
     } else if (isWav) {
+      onProgress?.(72);
       const res = sanitizeWav(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
     } else {
+      onProgress?.(72);
       const res = sanitizeWebm(arrayBuffer);
       sanitizedBuffer = res.buffer;
       tagsCleaned = res.tagsFound;
     }
 
-    onProgress?.(90);
+    onProgress?.(88);
 
     const outMime =
       file.type ||

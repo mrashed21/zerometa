@@ -53,7 +53,7 @@ export async function processUnifiedMediaFile(
   // 1. Documents (PDF)
   if (mediaType === "document" || file.name.toLowerCase().endsWith(".pdf")) {
     onProgress?.(30);
-    const { blob, metadataAfter } = await sanitizePdfMetadata(file);
+    const { blob, metadataAfter } = await sanitizePdfMetadata(file, onProgress);
     onProgress?.(100);
 
     const filename = file.name.replace(/\.[^.]+$/, "_cleaned.pdf");

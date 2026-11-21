@@ -76,7 +76,11 @@ export default function PdfMetadataRemoverPage() {
       );
 
       try {
-        const { blob, metadataAfter } = await sanitizePdfMetadata(item.file);
+        const { blob, metadataAfter } = await sanitizePdfMetadata(item.file, (p) => {
+          setFiles((prev) =>
+            prev.map((f) => (f.id === item.id ? { ...f, progress: p } : f))
+          );
+        });
         const filename = item.file.name.replace(/\.[^.]+$/, "_cleaned.pdf");
 
         setFiles((prev) =>

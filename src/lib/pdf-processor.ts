@@ -87,12 +87,18 @@ export async function extractPdfMetadata(file: File): Promise<MetadataField[]> {
  * (for example annotations, attachments, embedded files, or custom streams)
  * has been removed.
  */
-export async function sanitizePdfMetadata(file: File): Promise<{
+export async function sanitizePdfMetadata(
+  file: File,
+  onProgress?: (progress: number) => void,
+): Promise<{
   blob: Blob;
   metadataAfter: MetadataField[];
   cleanedKeys: string[];
 }> {
-  const pdf = await PDFDocument.load(await file.arrayBuffer(), {
+  onProgress?.(15);
+  const arrayBuffer = await file.arrayBuffer();
+  onProgress?.(45);
+  const pdf = await PDFDocument.load(arrayBuffer, {
     updateMetadata: false,
     throwOnInvalidObject: true,
   });
@@ -111,8 +117,10 @@ export async function sanitizePdfMetadata(file: File): Promise<{
   // XMP is attached through the document catalog's /Metadata entry.
   pdf.catalog.delete(PDFName.of("Metadata"));
 
+  onProgress?.(75);
   // Prevent pdf-lib from adding a new Producer or ModificationDate on save.
   const bytes = await pdf.save({ useObjectStreams: true });
+  onProgress?.(90);
   const output = await PDFDocument.load(bytes, {
     updateMetadata: false,
     throwOnInvalidObject: true,

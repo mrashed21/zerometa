@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,14 +19,17 @@ import type { ProcessingOptions } from "@/lib/types";
 import {
   Check,
   FileType,
+  FileText,
   Image as ImageIcon,
   ImagePlus,
+  Layers,
   Loader2,
   Lock,
   Maximize2,
   Music,
   Play,
   Settings2,
+  Shield,
   Unlock,
   Video,
 } from "lucide-react";
@@ -37,7 +41,7 @@ interface ControlPanelProps {
   onProcess: () => void;
   onCancel?: () => void;
   isProcessing: boolean;
-  activeTab: "image" | "video" | "audio";
+  activeTab: "all" | "image" | "video" | "audio" | "document";
   fileCount: number;
 }
 
@@ -369,18 +373,57 @@ export function ControlPanel({
             </>
           )}
 
+          {/* Universal Settings (All formats) */}
+          {activeTab === "all" && (
+            <>
+              <Separator className="bg-border/50" />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-primary" /> Universal Privacy Rules
+                  </Label>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-300">
+                    All Active
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <ChecklistItem checked label="Strip Image Metadata (EXIF, GPS, IPTC, XMP)" />
+                  <ChecklistItem checked label="Strip Video Container Metadata (MP4/MOV udta, tags)" />
+                  <ChecklistItem checked label="Strip Audio Tags (ID3v1, ID3v2, RIFF INFO)" />
+                  <ChecklistItem checked label="Strip PDF Metadata (Info dict & XMP streams)" />
+                  <ChecklistItem checked label="Reset Timeline & Recording Timestamps" />
+                  <ChecklistItem checked label="100% In-Memory Offline Processing" />
+                  <ChecklistItem
+                    checked={isOptimized}
+                    interactive
+                    onChange={() => toggleOptimize(!isOptimized)}
+                    label="Optimize compression / file size"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
           {/* Video Settings */}
           {activeTab === "video" && (
             <>
               <Separator className="bg-border/50" />
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
-                  <Video className="w-3.5 h-3.5" /> Video Rules
-                </Label>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-primary" /> Video Privacy Rules
+                  </Label>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-300">
+                    All Selected
+                  </Badge>
+                </div>
                 <div className="space-y-2">
-                  <ChecklistItem checked label="Remove metadata" />
-                  <ChecklistItem checked label="Preserve resolution" />
-                  <ChecklistItem checked label="Preserve audio" />
+                  <ChecklistItem checked label="Purge User Data Atom (udta)" />
+                  <ChecklistItem checked label="Purge Camera & Device UUID tags" />
+                  <ChecklistItem checked label="Strip GPS coordinates & location tags" />
+                  <ChecklistItem checked label="Reset creation & modification timeline timestamps" />
+                  <ChecklistItem checked label="Preserve video resolution & audio sync" />
+                  <ChecklistItem checked label="Lossless container stream copy (No re-encode loss)" />
                   <ChecklistItem
                     checked={isOptimized}
                     interactive
@@ -396,19 +439,50 @@ export function ControlPanel({
           {activeTab === "audio" && (
             <>
               <Separator className="bg-border/50" />
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
-                  <Music className="w-3.5 h-3.5" /> Audio Rules
-                </Label>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
+                    <Music className="w-3.5 h-3.5 text-primary" /> Audio Privacy Rules
+                  </Label>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-300">
+                    All Selected
+                  </Badge>
+                </div>
                 <div className="space-y-2">
-                  <ChecklistItem checked label="Remove metadata" />
-                  <ChecklistItem checked label="Preserve audio quality" />
+                  <ChecklistItem checked label="Remove ID3v2 headers (Artist, Album, Title)" />
+                  <ChecklistItem checked label="Remove ID3v1 trailer tags" />
+                  <ChecklistItem checked label="Purge RIFF LIST (INFO) chunks" />
+                  <ChecklistItem checked label="Preserve audio bitrate & lossless stream" />
                   <ChecklistItem
                     checked={isOptimized}
                     interactive
                     onChange={() => toggleOptimize(!isOptimized)}
                     label="Optimize file size"
                   />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Document / PDF Settings */}
+          {activeTab === "document" && (
+            <>
+              <Separator className="bg-border/50" />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-primary" /> PDF Privacy Rules
+                  </Label>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-300">
+                    All Selected
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  <ChecklistItem checked label="Remove Author, Creator & Producer fields" />
+                  <ChecklistItem checked label="Remove CreationDate & ModDate timestamps" />
+                  <ChecklistItem checked label="Purge embedded XML/XMP metadata packets" />
+                  <ChecklistItem checked label="Preserve readable text, layout & vector elements" />
+                  <ChecklistItem checked label="Zero cloud uploads (100% Client-Side Engine)" />
                 </div>
               </div>
             </>
